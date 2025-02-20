@@ -1,16 +1,10 @@
-import lightning from '../assets/Lightning.svg'
+import logo from '../assets/Logo.svg'
 import mine from '../assets/artifact/mine.svg'
 import map from '../assets/artifact/map.svg'
 
 export const LogoTitle = () =>{
-    return <div className='logo-container'>
-            <div className="logo-up">
-              <h1>WIKI</h1>
-              <img src={lightning} alt="" />
-              <h1>PEED</h1>
-            </div>
-            <h3>QUI SERA LE PLUS RAPIDE</h3>
-          </div>
+    return <figure className='logo'><img src={logo} alt="" /></figure>
+           
 }
 
 export const CreditButton = () =>{
@@ -42,13 +36,18 @@ export const ArtifactsList = () => {
 
 export const RuleBlox = (props :{content : string}) =>{
     return <div className='rule-bloc'>
-      <p className='rules'> {props.content}</p>
+      <span className='rules'> {props.content}</span>
       </div>
 } 
 
 export const PlayButton = () =>{
   return<button className='PlayButton'> Play ! →</button>
 } 
+
+export const Title = (props :{title : string}) => {
+  return <p className='title'> {props.title} </p>
+}
+
 
 export const Footer = (props :{content1 : string, content2 : string, content3 : string}) => {
   return (

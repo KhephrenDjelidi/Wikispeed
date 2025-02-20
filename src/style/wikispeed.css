@@ -6,62 +6,27 @@
   padding: 0;
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  width: auto;
+.logo{
   margin: auto;
- 
-}
-
-.logo-up{
-  margin-top: 10%;
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-  width: 100%;
   justify-content: center;
-  gap: 8%;
+  align-items: center;
+  display: flex;
+
+}
+.logo img{
+  width: 40vw;
+  height: auto;
 }
 
-.logo-up h1{
-    font-family: 'Anton', sans-serif;
-    font-size:10rem;
-    color: #fff;
-    transform: skewX(-10deg);
-    text-shadow: 
-    -5px -5px 0 black, 
-     5px -5px 0 black, 
-    -5px  5px 0 black, 
-     5px  5px 0 black;
+.background{
+  position: absolute;
+  bottom: -50vh;
+  width: 100vw;
+  z-index: -1;
+  left: -30vw;
 }
-
-.logo-up img{
-   width: 18vh;
-   position: absolute;
-   transform: translateX(10%);  
-}
-
-.logo-container h3{
-  font-family: 'Poppins', sans-serif;
-  text-align: center;
-  z-index: 100;
-  color: #fff;
-  font-size: 2rem;
-  text-shadow: 
-  -1px -1px 0 black, 
-   1px -1px 0 black, 
-  -1px  1px 0 black, 
-   1px  1px 0 black;
-
-   letter-spacing: 1.2px;
-}
-
-.manjari{
-  font-family: 'Manjari', sans-serif;
-  transform: translateY(5px);
+.background img{
+  width:160%
 }
 /* -------------------------- LOGO - TITLE -------------------------- */
 
@@ -84,9 +49,12 @@
   align-items: center;
   justify-content: center;
   width: min-content;
-  padding: 15px 25px;
+  padding: 12px 22px;
   border-radius: 12px;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
+  position: absolute;
+  top: 30px;
+  right:40px
 }
 /* -------------------------- CREDITS -------------------------- */
 
@@ -121,12 +89,10 @@
 
 .rule-bloc{
   background-color: #4943c6c8;
-  width: 22vw;
-  height: 30vh;
-  border-radius: 7%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 17vw;
+  padding: 4%;
+  border-radius: 20px;
+  display: block;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
 }
@@ -135,7 +101,7 @@
   font-family: 'Manjari', sans-serif;
   font-size: 16px;
   color: white;
-  width: 60%;
+  width: 40%;
 }
 
 .PlayButton{
@@ -151,17 +117,38 @@
   cursor: pointer;
 }
 
+.PlayButton:active{
+  background-color : #dc9e00;
+
+}
+
+.title{
+  color: #FFB700;
+  text-shadow: 
+  1px 1px 0 black; 
+  font-weight: 400;
+  font-size: 20px;
+  font-family: 'Manjari', sans-serif;
+}
+
 /* --------------------------SET PROFILE-------------------------- */
+.selection-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .selection{
   display: flex;
   justify-content: space-around;
+  align-items: center;
   width:80%
   
 }
 .setProfile{
   background-color: #4943c6c8;
-  width: 17vw;
-  height: 265px;
+  width: fit-content;
+  height: fit-content;
+  padding:30px 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -169,6 +156,7 @@
   border-radius: 5%;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
+  gap:20px;
     input[type="text"]{
       outline:none;
       font-size:16px;
@@ -188,7 +176,7 @@
   border:4px solid black;
   display: flex;
   height:145px;
-  width:145px;
+  width:80%;
   overflow: hidden;
   cursor:pointer;
 }
@@ -219,6 +207,24 @@
   margin-top: 20px;
 }
 
+
+/* -------------------------- Game -------------------------- */
+
+.CreateGame{
+  background-color: #4943c6c8;
+  width: 17vw;
+  padding: 4%;
+  border-radius: 20px;
+  display: block;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.CreateGame p{
+  color: white;
+  font-family: 'Manjari', sans-serif;
+  font-size: 16px;
+}
 
 /* -------------------------- Footer -------------------------- */
 .footer{

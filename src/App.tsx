@@ -1,15 +1,31 @@
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './Home'
+import MultiCreation from './MultiCreation'
+import MultiShare from './MultiShare'
+import MultiGame from './MultiGame'
+import SoloCreation from './SoloCreation'
+import EndGame from './EndGame'
+
 import './style/App.css'
 import './style/wikispeed.css'
 
-function App() {
 
+function App() {
+  
   return (
    
-        <Home />
-      
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/multicreation" element={<MultiCreation />} />
+        <Route path="/multishare" element={<MultiShare />} />
+        <Route path="/multigame" element={<MultiGame />} />
+        <Route path="/solocreation" element={<SoloCreation />} />
+        <Route path="/endgame" element={<EndGame/>} />
+
+      </Routes>
+    </Router>
+  );
 }
 
 export default App

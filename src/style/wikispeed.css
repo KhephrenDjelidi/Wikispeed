@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Antonio:wght@100..700&family=Manjari:wght@100;400;700&family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 *{
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 .logo{
@@ -11,22 +12,61 @@
   justify-content: center;
   align-items: center;
   display: flex;
+  height: 40vh;
 
 }
 .logo img{
-  width: 40vw;
-  height: auto;
+  height:100%;
+  width: auto;
+  object-fit: cover;
+ 
 }
 
-.background{
+.background {
   position: absolute;
-  bottom: -50vh;
+  bottom: 0;
+  left: 30%;
+  transform: translatex(-50%) translateY(10%);
   width: 100vw;
+  max-width: 200vw;
   z-index: -1;
-  left: -30vw;
 }
-.background img{
-  width:160%
+
+.background img {
+  width: 140%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media screen and (max-width: 1600px) {
+  .background {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+  
+}
+@media screen and (max-width: 1350px) and (min-height: 1100px) {
+  .background {
+    transform: translateX(-50%) translateY(-10%) !important;
+  }
+  
+}
+@media screen and (max-height: 900px) {
+  .background {
+    transform: translateX(-50%) translateY(10%) !important;
+  }
+  
+}
+@media screen and (max-height: 800px) {
+  .background {
+    transform: translateX(-50%) translateY(20%) !important;
+  }
+  
+}
+
+
+.main-page{
+  height: 100vh;
+  position: relative;
 }
 /* -------------------------- LOGO - TITLE -------------------------- */
 
@@ -42,7 +82,7 @@
 
 .credit-button{
   font-family: 'Manjari Bold', sans-serif;
-  text-transform: uppercase;
+ 
   background-color: #4943C6;
   color: white;
   display: flex;
@@ -56,7 +96,20 @@
   top: 30px;
   right:40px
 }
+.manjari{
+  font-family: 'Manjari', sans-serif;
+  transform:translateY(5px);
+}
 /* -------------------------- CREDITS -------------------------- */
+
+
+
+
+.monsters{
+  position: absolute;
+}
+
+
 
 
 /* -------------------------- SELECT MODE -------------------------- */
@@ -70,6 +123,18 @@
   justify-content: end;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
+  transition: 0.4s;
+  backdrop-filter: blur(15px);
+}
+
+.select-mode:hover{
+  transform: scale(1.1) rotate(4deg);
+  cursor: pointer;
+  
+}
+
+.select-mode:last-child:hover {
+  transform: scale(1.1) rotate(-4deg);
 }
 
 .select-mode .mode{
@@ -80,19 +145,27 @@
 .select-img{
   position: absolute;
   bottom: 0;
+  width: 100%;
 }
 
 .mode .manjari{
   color:#fff;
   text-shadow: 0px 4px 6px rgba(0, 0, 0, 0.92);
 }
-
+.rule-list{
+  display: flex;
+  justify-content: center;
+  gap: 3vw;
+  margin-top: 20px;
+}
 .rule-bloc{
   background-color: #4943c6c8;
   width: 17vw;
-  padding: 4%;
+  padding: 4% 2%;
   border-radius: 20px;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
 }
@@ -101,7 +174,8 @@
   font-family: 'Manjari', sans-serif;
   font-size: 16px;
   color: white;
-  width: 40%;
+  text-justify: auto;
+  width: 90%;
 }
 
 .PlayButton{
@@ -123,12 +197,14 @@
 }
 
 .title{
+  margin-top: 15%;
   color: #FFB700;
-  text-shadow: 
-  1px 1px 0 black; 
+  text-shadow: 0px 4px 6px rgba(0, 0, 0, 1);
   font-weight: 400;
-  font-size: 20px;
+  font-size: 35px;
+  text-transform: uppercase;
   font-family: 'Manjari', sans-serif;
+  text-align: center;
 }
 
 /* --------------------------SET PROFILE-------------------------- */
@@ -137,6 +213,8 @@
   display: flex;
   justify-content: center;
 }
+
+
 .selection{
   display: flex;
   justify-content: space-around;
@@ -145,9 +223,10 @@
   
 }
 .setProfile{
+  width: 20vw;
+  height: 20vw;
+  backdrop-filter: blur(15px);
   background-color: #4943c6c8;
-  width: fit-content;
-  height: fit-content;
   padding:30px 50px;
   display: flex;
   align-items: center;
@@ -160,26 +239,42 @@
     input[type="text"]{
       outline:none;
       font-size:16px;
-      background:transparent;
-      border:4px solid black;
-      border-radius: 5%;
+      background:#4C489E;
+      border:3px solid black;
+      border-radius: 10px;
       padding:10px;
       display: flex;
       align-items: center;
       flex-direction: row;
       color:white;
-      max-width:200px;
+      height: 3vw;
+      width: 14vw;
     }
 }
-.profilePicture{
-  border-radius:100%;
-  border:4px solid black;
+.profilePicture {
+  width: 10vw ;
+  height: 10vw;
+  border-radius: 50%; /* Rend le conteneur parfaitement rond */
+  border: 3px solid black;
   display: flex;
-  height:145px;
-  width:80%;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  cursor:pointer;
+  cursor: pointer;
+  background-color: #60E513; /* Ajoute un fond en cas d'image transparente */
 }
+
+/* Assure que l'image s'adapte bien */
+.profilePicture img {
+  width: 25vh;
+  height: 25vh;
+  transform: translateY(20%);
+}
+
+@media (max-width: 1400px) {
+
+}
+
 
 
 /* -------------------------- SELECT MODE -------------------------- */
@@ -212,25 +307,65 @@
 
 .CreateGame{
   background-color: #4943c6c8;
-  width: 17vw;
-  padding: 4%;
-  border-radius: 20px;
-  display: block;
+  width: 20vw;
+  padding: 2.5%;
+  border-radius: 15px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: pointer;
+}
+
+.JoinGame{
+  background-color: #4943c6c8;
+  width: 20vw;
+  padding: 2.5%;
+  border-radius: 15px;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
 }
 
-.CreateGame p{
+.CreateGame p, .JoinGame p{
   color: white;
   font-family: 'Manjari', sans-serif;
   font-size: 16px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  text-transform: uppercase;
 }
+
+.JoinGame input{
+  background-color: #4943c600;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid white;
+  padding: 10px;
+  color: white;
+  outline: none;
+  font-size: 14px;
+}
+
+.JoinGame input::placeholder{
+  font-family: 'Manjari', sans-serif;
+  color: #939393;
+}
+
+.MultiCreation{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 30px;
+}
+
 
 /* -------------------------- Footer -------------------------- */
 .footer{
  display: flex;
  flex-direction: row;
  gap: 30px;
+ justify-content: center;
+ margin-bottom: 1%;
 }
 
 .footer p{
@@ -238,4 +373,20 @@
   text-decoration: underline;
   font-size: 16px;
   font-family: 'Manjari', sans-serif;
+}
+/* -------------------------- Component BottomRedirection -------------------------- */
+.bottomredirection{
+  color:white;
+  text-decoration:none;
+  font-size:20px;
+  align-items: center;
+  position: absolute;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bottomredirection svg{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }

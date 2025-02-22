@@ -47,7 +47,7 @@ function Home() {
                     <div className="selection">                 
                     <SelectMode title='Solo' img={images.green} link='multigame'/>
                     <SetProfile image={images.damien} username={undefined} />
-                    <SelectMode title='Multijoueur' img={images.bibabo} link='multishare'/> 
+                    <SelectMode title='Multijoueur' img={images.bibabo} link='multicreation'/> 
                     </div>
                  </div>
                  <BottomRedirection content="How To Play" link="#rules"/>

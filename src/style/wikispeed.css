@@ -311,56 +311,156 @@
 
 .CreateGame{
   background-color: #4943c6c8;
-  width: 20vw;
+  width: 22vw;
   padding: 2.5%;
   border-radius: 15px;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
+  transition: transform 0.3s ease-in-out;
+}
+
+.CreateGame:active{
+  background-color: #413bbbc8;
+}
+
+.CreateGame:hover {
+  animation: pulse 0.6s ease-in-out infinite alternate;
   cursor: pointer;
+}
+
+@keyframes pulse {
+  100% {
+    transform: scale(1.02);
+  }
 }
 
 .JoinGame{
   background-color: #4943c6c8;
-  width: 20vw;
+  width: 22vw;
   padding: 2.5%;
   border-radius: 15px;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .CreateGame p, .JoinGame p{
   color: white;
   font-family: 'Manjari', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   justify-content: center;
   align-items: center;
   display: flex;
   text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .JoinGame input{
   background-color: #4943c600;
-  width: 100%;
+  width: 15vw;
   border: none;
   border-bottom: 2px solid white;
   padding: 10px;
   color: white;
   outline: none;
-  font-size: 14px;
+  font-size: 16px;
+  transition: 0.5s;
+  margin-top: 5%;
 }
 
 .JoinGame input::placeholder{
   font-family: 'Manjari', sans-serif;
   color: #939393;
+  display: flex;
+  text-align: center;
 }
+
+input:focus {
+  border-color: #b1acf0;
+}
+
 
 .MultiCreation{
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 30px;
+  gap: 40px;
+  position: relative;
+  top: 60px;
 }
+
+@media screen and (max-width: 1600px) {
+ .JoinGame,.CreateGame{
+    width: 25vw;
+ }
+ .JoinGame input{
+  width: 18vw;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .JoinGame,.CreateGame{
+     width: 30vw;
+     padding: 3.5%;
+  }
+  .JoinGame input{
+    width: 23vw;
+    }
+ }
+
+ @media screen and (max-width: 1120px) {
+  .JoinGame,.CreateGame{
+     width: 38vw;
+     padding: 4.5%;
+  }
+  .JoinGame input{
+    width: 25vw;
+    }
+ }
+
+ @media screen and (max-width: 900px) {
+  .JoinGame,.CreateGame{
+     width: 47vw;
+     padding: 5.5%;
+  }
+  .JoinGame input{
+    width: 33vw;
+    }
+ }
+
+ @media screen and (max-width: 720px) {
+  .JoinGame,.CreateGame{
+     width: 55vw;
+     padding: 6%;
+  }
+  .JoinGame input{
+    width: 38vw;
+    }
+ }
+
+ @media screen and (max-width: 600px) {
+  .JoinGame,.CreateGame{
+     width: 67vw;
+     padding: 7%;
+  }
+  .JoinGame input{
+    width: 45vw;
+    }
+ }
+
+ @media screen and (max-width: 600px) {
+  .JoinGame,.CreateGame{
+     width: 80vw;
+     padding: 8%;
+  }
+  .JoinGame input{
+    width: 55vw;
+    }
+ }
 
 
 /* -------------------------- Footer -------------------------- */

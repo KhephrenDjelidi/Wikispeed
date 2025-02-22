@@ -18,14 +18,11 @@ const Artifacts = (props:{img:string}) =>{
       </div>
 }
 
-export const ArtifactsList = () => {
-  const artifactImages = [mine,map,map,map,map,map,map
-    
-  ]; 
+export const ArtifactsList = (props:{imgs : string[]}) => {
 
   return (
     <div className="artifacts-list">
-      {artifactImages.map((img, index) => (
+      {props.imgs.map((img, index) => (
         <Artifacts key={index} img={img} />
       ))}
     </div>
@@ -92,4 +89,25 @@ export const Podium=(props:{ranking:Array<Player>})=>{
   )}
   </div>
   </div>
+}
+
+
+
+export function Button(props: { children: string }) {
+  return <button>{props.children}</button>;
+}
+
+export function List(props: { children: string }) {
+  return <select name="list" id="list">
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? '1 article' : '3 minutes'}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 2 : 5}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 3 : 10}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 4 : 15}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 5 : 20}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 6 : 25}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 7 : 30}</option>
+      <option value={props.children == 'article' ? 'art ' : 'time'}>{props.children == 'article' ? 8 : '--'}</option>
+      
+  </select>;
+
 }

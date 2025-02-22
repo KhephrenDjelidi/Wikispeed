@@ -1,6 +1,8 @@
 import { LogoTitle } from './component/Component'
 import {CreditButton} from './component/Component'
 import back from './assets/back.svg'
+import mine from './assets/artifact/mine.svg'
+import map from './assets/artifact/map.svg'
 import {SelectMode} from './component/SelectMode'
 import {SetProfile} from './component/SetProfile'
 import {RuleBlox} from './component/Component'
@@ -21,6 +23,9 @@ import images from './assets/monster/images'
 import './style/wikispeed.css'
 
 function Home() {
+  const artifactImages = [mine,map,map,map,map,map,map
+    
+  ]; 
 
   return (
 
@@ -40,9 +45,9 @@ function Home() {
 
                  <div className="selection-container">
                     <div className="selection">                 
-                    <SelectMode title='Solo' img={images.green} link='solocreation'/>
+                    <SelectMode title='Solo' img={images.green} link='multigame'/>
                     <SetProfile image={images.damien} username={undefined} />
-                    <SelectMode title='Multijoueur' img={images.bibabo} link='multicreation'/> 
+                    <SelectMode title='Multijoueur' img={images.bibabo} link='multishare'/> 
                     </div>
                  </div>
                  <BottomRedirection content="How To Play" link="#rules"/>
@@ -59,7 +64,7 @@ function Home() {
                   </div>
 
                   <Title title='Artéfacts'></Title>
-                  <ArtifactsList/>
+                  <ArtifactsList imgs={artifactImages}/>
                   <PlayButton/>
                   <Link to="/multigame">Aller à Multigame</Link>
                   <Footer content1='Aide' content2='Confidentialités' content3='Mentions Légales'></Footer>

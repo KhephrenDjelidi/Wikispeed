@@ -5,7 +5,7 @@ import MultiShare from './MultiShare'
 import MultiGame from './MultiGame'
 import SoloCreation from './SoloCreation'
 import EndGame from './EndGame'
-
+ 
 import './style/App.css'
 import './style/wikispeed.css'
 

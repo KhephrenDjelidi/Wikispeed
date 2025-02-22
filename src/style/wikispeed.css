@@ -100,6 +100,10 @@
   font-family: 'Manjari', sans-serif;
   transform:translateY(5px);
 }
+.manjariB{
+  font-family: 'Manjari Bold', sans-serif;
+  transform:translateY(5px);
+}
 /* -------------------------- CREDITS -------------------------- */
 
 
@@ -360,6 +364,7 @@
 
 
 /* -------------------------- Footer -------------------------- */
+
 .footer{
  display: flex;
  flex-direction: row;
@@ -375,6 +380,7 @@
   font-family: 'Manjari', sans-serif;
 }
 /* -------------------------- Component BottomRedirection -------------------------- */
+
 .bottomredirection{
   color:white;
   text-decoration:none;
@@ -385,6 +391,7 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
 .bottomredirection svg{
   position: absolute;
   left: 50%;

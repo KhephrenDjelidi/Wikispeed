@@ -1,7 +1,9 @@
 import logo from '../assets/Logo.svg'
 import mine from '../assets/artifact/mine.svg'
 import map from '../assets/artifact/map.svg'
-import type { Player } from '../EndGame';
+import crown from '../assets/icons/crown.svg'
+
+import type { Player } from '../types/Player.ts';
 export const LogoTitle = () =>{
     return <figure className='logo'><img src={logo} alt="" /></figure>
            
@@ -60,37 +62,58 @@ export const BottomRedirection = (props :{link : string,content:string}) =>{
 </a>
 }
 export const Podium=(props:{ranking:Array<Player>})=>{
-  return <div className="podium">
-    <div className="second">
-  {props.ranking[1] && (<img src={props.ranking[1].avatar} alt={props.ranking[1].name}/>)}
-  {props.ranking[1] && (
-    <>
-      <p className="name">{props.ranking[1].name}</p>
-      <p className="time">{props.ranking[1].time}s</p>
-    </>
-  )}
-  </div>
-  <div className="first">
-  {props.ranking[0] && (<img src={props.ranking[0].avatar} alt={props.ranking[0].name}/>)}
-  {props.ranking[0] && (
-    <>
-      <p className="name">{props.ranking[0].name}</p>
-      <p className="time">{props.ranking[0].time}s</p>
-    </>
-  )}
-  </div>
-  <div className="third">
-  {props.ranking[2] && (<img src={props.ranking[2].avatar} alt={props.ranking[2].name}/>)}
-  {props.ranking[2] && (
-    <>
-      <p className="name">{props.ranking[2].name}</p>
-      <p className="time">{props.ranking[2].time}s</p>
-    </>
-  )}
-  </div>
-  </div>
+    return (
+        <ul className="podium manjari">
+            {props.ranking[1] && (
+                <li className="second">
+                    <div className="avatar">
+                        <img src={props.ranking[1].avatar} alt={props.ranking[1].name} />
+                    </div>
+                    <div className="block">
+                        <h1>2</h1>
+                        <p className="name">{props.ranking[1].name}</p>
+                        <p className="time">{props.ranking[1].time}s</p>
+                    </div>
+                </li>
+            )}
+            {props.ranking[0] && (
+                <li className="first">
+                    <div className="avatar">
+                        <img src={crown} alt="crown"/>
+                        <img src={props.ranking[0].avatar} alt={props.ranking[0].name} />
+                    </div>
+                    <div className="block">
+                        <h1>1</h1>
+                        <p className="name">{props.ranking[0].name}</p>
+                        <p className="time">{props.ranking[0].time}s</p>
+                    </div>
+                </li>
+            )}
+            {props.ranking[2] && (
+                <li className="third">
+                    <div className="avatar">
+                        <img src={props.ranking[2].avatar} alt={props.ranking[2].name} />
+                    </div>
+                    <div className="block">
+                        <h1>3</h1>
+                        <p className="name">{props.ranking[2].name}</p>
+                        <p className="time">{props.ranking[2].time}s</p>
+                    </div>
+                </li>
+            )}
+        </ul>
+    );
 }
-
+const Rank = (props :{player:Player,position:number}) => {
+    return <li className="playerRank"><h1>{props.position}</h1><img src={props.player.avatar} alt={props.player.name}/><p>{props.player.name}</p></li>
+}
+export const Ranking=(props :{ranking:Array<Player>})=>{
+    return <ul className="ranking">{
+        props.ranking.map((r, i) => {
+            return <Rank player={r} position={i + 1}/>
+        })
+    }</ul>
+}
 
 
 export function Button(props: { children: string }) {

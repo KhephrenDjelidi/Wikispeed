@@ -95,7 +95,6 @@ export const RoomJoiner = (props: {initialUserName: string, initialRoomId: strin
   const joinRoom = () => {
       setTimeout(() => {
           props.onRoomJoined(userName, roomId);
-          console.log(roomId);
       }, 300); 
   };
 
@@ -211,7 +210,6 @@ export const Chatter = (props: {chatManager: ChatManager}) => {
       setRoomId(roomId);
       setUserName(userName);
       setIsRoom(true)
-      console.log(isRoom);
     } catch (error) {
       alert('Error creating room: ' + error);
     }
@@ -413,9 +411,7 @@ export const RealChatter = (props: {name:string,chatManager: RealChatManager }) 
 
   const handleRoomCreated = async (userName: string, roomId: string) => {
     try {
-      console.log("ddd")
       await props.chatManager.createRoom(userName);
-      console.log("eeeeeeeeeeee")
       setRoomId(roomId);
       setUserName(userName);
       setIsRoom(true)
@@ -481,14 +477,10 @@ export const FinChatter = (props: {chatManager: RealChatManager, initialUserName
 
   const handleRoomCreated = async (userName: string, roomId: string) => {
     try {
-      console.log("ddd")
       await props.chatManager.createRoom(userName);
-      console.log("eeeeeeeeeeee")
       setRoomId(roomId);
       setUserName(userName);
       setIsRoom(true)
-      console.log(isRoom);
-      console
     } catch (error) {
       alert('Error creating room: ' + error);
     }

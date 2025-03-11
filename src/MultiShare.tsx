@@ -29,11 +29,13 @@ function MultiShare() {
   const [wordsList, setWordsList] = useState<string[]>([]); // Liste des mots ajoutés
 
   useEffect(() => {
-    sharedChatManager.setPlayersListener((players) => {
-      setPlayers(players);
+    sharedChatManager.setPlayersListener((newPlayers) => {
+      console.log("🔄 Nouvelle liste des joueurs reçue :", newPlayers);
+      setPlayers(newPlayers); // Mise à jour directe sans doublons
     });
   }, []);
-
+  
+  
   // Gestionnaire pour naviguer vers PageB avec les données
   const handlePlayGame = (event: React.FormEvent) => {
     event.preventDefault();  // Empêcher la soumission du formulaire

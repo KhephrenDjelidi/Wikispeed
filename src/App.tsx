@@ -36,6 +36,7 @@ function App() {
         
         <Route path="/solocreation" element={<SoloCreation />} />
         <Route path="/endgame" element={<EndGame/>} />
+        
         <Route path="/endgamesolo" element={<EndGameSolo/>} />
         <Route path="/test" element={<Test/>}/>
         </Routes>

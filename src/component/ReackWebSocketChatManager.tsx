@@ -62,7 +62,7 @@ export class RealWebSocketChatManager implements RealChatManager {
         });
   
         this.socket?.send(message);
-  
+        this.playersListener([userName]); // Ajoute le créateur à la liste
         resolve(roomId);
       };
   

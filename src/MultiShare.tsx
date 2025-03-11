@@ -194,12 +194,7 @@ function MultiShare() {
           <div className="title">Joueurs</div>
           <div className="container_ul">
             <ul>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
-                <li>Kabuto  <DeletePLayer player="Kabuto"/></li>
+              
             </ul>
           </div>
         </div>

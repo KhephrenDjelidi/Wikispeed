@@ -14,6 +14,7 @@ import { Background } from './assets/back';
 import './style/wikispeed.css';
 import { PlayButton } from './component/RouteComponent';
 
+
 function Home() {
 
 
@@ -26,6 +27,8 @@ function Home() {
     }
     navigateToSolo(link, { state: { username: inputValue } });
   };
+
+
 
   const artifacts = [
     { name: 'Mine', description: 'FTG Khephren si tu trouves ça moche, c\'est pas mon problème', img: mine },
@@ -40,6 +43,7 @@ function Home() {
     <button
   disabled={inputValue.trim() === ''}  // Désactive le bouton si inputValue est vide
   onClick={() => navigateToPage('./solocreation')}
+  
 >
   Jouer
 </button>
@@ -76,7 +80,7 @@ function Home() {
               />
             </SoundPlayer>
 
-            <SetProfile username={inputValue} onChange={(event) => setInputValue(event.target.value)} />
+            <SetProfile username={inputValue}  onChange={(event) => setInputValue(event.target.value)} />
             <NextHome title="Jouer" link="homephone" />
 
             <SoundPlayer hoverSound={hover} clickSound={click} volume={0.3}>                

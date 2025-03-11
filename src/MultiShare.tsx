@@ -202,15 +202,12 @@ function MultiShare() {
           <div className="title">Joueurs</div>
           <div className="container_ul">
             <ul>
-<<<<<<< HEAD
-              
-=======
               {players.map((player, index) => (
                 <li key={index}>
                   {player} <DeletePLayer player={player}/>
                 </li>
               ))}
->>>>>>> 4e5dab72bdf3f0019eec24c4a3e83446e711e6ef
+              
             </ul>
           </div>
         </div>

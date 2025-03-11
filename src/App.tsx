@@ -16,7 +16,6 @@ import './style/App.css'
 import './style/wikispeed.css'
 import SoloGame from "./SoloGame";
 
-
 import { AudioProvider } from './script/AudioContext';
 
 function App() {

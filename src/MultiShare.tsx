@@ -1,5 +1,5 @@
 import "./style/App.css";
-import { Button } from "./component/Component.tsx";
+import { Button, Impossible } from "./component/Component.tsx";
 import { List } from "./component/Component.tsx";
 import { LogoTitle } from './component/Component'
 import {CreditButton} from './component/Component'
@@ -35,6 +35,8 @@ function MultiShare() {
   console.log("Username:", username);
 
 
+
+
   useEffect(() => {
     sharedChatManager.setPlayersListener((players) => {
       setPlayers(players);
@@ -42,6 +44,8 @@ function MultiShare() {
   }, []);
 
 
+  const putBlackSettings = () => {
+    document.getElementById("impossibleUse")!.style.display = "none";}
    
 
   const handlePlayerRemove = (playerToRemove: string) => {
@@ -132,11 +136,12 @@ function MultiShare() {
               </div>
 
 
-              <div className="left">
-                <span className="title">Parametre</span>
+              <div className="left" >
+                <Impossible username={username} owner={owner}/>
+                <span className="title">Parametre</span >
 
                 <table className="container_ul left-phone">
-                  <tr>
+                  <tr id={username !== owner ? "gris" : "" }>
                     <td>
                       <span className="nbreArticle opt span-phone">Nombre d'articles</span>
                     </td>
@@ -148,7 +153,7 @@ function MultiShare() {
                     </td>
                   </tr>
 
-                  <tr>
+                  <tr id={username !== owner ? "gris" : "" }>
                     <td>
                       <span className="artefacts opt span-phone">Artefacts</span>
                     </td>

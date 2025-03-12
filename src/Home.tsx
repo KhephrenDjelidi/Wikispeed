@@ -16,8 +16,16 @@ import { PlayButton } from './component/RouteComponent';
 
 function Home() {
   const [inputValue, setInputValue] = useState<string>('');
+  const [avatar, setAvatar] = useState<string>('/src/assets/avatar/Avatar_damien.svg'); 
+
   const navigateToSolo = useNavigate(); 
-  
+
+  const handleAvatarChange = (newAvatar: string) => {
+    setAvatar(newAvatar); // Mets à jour l'avatar
+  };
+ 
+  console.log('Avatar sélectioé :', avatar);
+
   // Validation de l'input
   const isInputValid = inputValue.trim() !== '';
   
@@ -29,7 +37,7 @@ function Home() {
     }
     else {
       try {
-      navigateToSolo(link, { state: { username: inputValue } });
+      navigateToSolo(link, { state: { username: inputValue , avatar: avatar} });
     } catch (error) {
       console.error('Erreur de navigation :', error);
     }
@@ -88,7 +96,7 @@ function Home() {
               />
             </SoundPlayer>
 
-            <SetProfile username={inputValue} onChange={(event) => setInputValue(event.target.value)} />
+            <SetProfile username={inputValue} onChange={(event) => setInputValue(event.target.value)} onAvatarChange={handleAvatarChange}/>
             <NextHome title="Jouer" link="homephone" />
 
             <SoundPlayer hoverSound={hover} clickSound={click} volume={0.3}>                

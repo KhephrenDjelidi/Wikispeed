@@ -19,7 +19,9 @@ function MultiCreation() {
   if (!location.state) {
     console.log("Aucun état trouvé");}
   const username = location.state.username;
+  const avatar = location.state.avatar;
   console.log("Nom d'utilisateur:", username);
+  console.log("Avatar:", avatar);
 
   const navigateToPage = (link: string  ) => {
     if (!username) {

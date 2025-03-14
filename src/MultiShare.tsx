@@ -9,7 +9,7 @@ import images from './assets/monster/images'
 import { DeletePLayer } from './component/Component'
 import { PlayGame } from "./component/GameComponent.tsx";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { ChatBox, FinChatter, RealChatter } from "./component/Chat.tsx";
 import Damien from "./assets/avatar/Avatar_damien.svg";
 import { sharedChatManager } from './chatManager';
@@ -30,20 +30,33 @@ function MultiShare() {
   const [choixMots, setChoixMots] = useState<string>("");
   const [wordsList, setWordsList] = useState<string[]>([]); // Liste des mots ajoutés
   const [copied, setCopied] = useState(false);
-  
+  const [isGame, setIsGame] = useState(false);
+  const [parameters, setParameters] = useState<any>(null);
   let owner = players[0];
   console.log("Owner:", owner);
   console.log("Username:", username);
   console.log("Avatar:", avatar);
 
 
-
+  console.log("isGame:", isGame);
 
   useEffect(() => {
     sharedChatManager.setPlayersListener((players) => {
       setPlayers(players);
     });
+    sharedChatManager.setIsGameListener((isGame) => {
+      setIsGame(isGame);
+    });
   }, []);
+
+
+  useEffect(() => {
+    if (isGame) {
+      handleGameStart();
+    }
+  }, [isGame]);
+
+
 
 
   const putBlackSettings = () => {
@@ -58,17 +71,31 @@ function MultiShare() {
   // Gestionnaire pour naviguer vers PageB avec les données
   const handlePlayGame = (event: React.FormEvent) => {
     event.preventDefault();  // Empêcher la soumission du formulaire
+    sharedChatManager.sendGameStart();
+   
+  };
 
-    const formData = {
+  const handleGameStart = () => {
+    /*const formData = {
       nombreArticles,
       artefacts,
       temps,
       randomMots,
       choixMots,
       wordsList
+    };*/
+    const formData = {
+      nombreArticles:"3",
+      artefacts:"OUI",
+      temps:"10",
+      randomMots: "OUI",
+      choixMots: "mot",
+      wordsList: ["mot1","mot2","mot3"]
     };
-    navigate("/multigame", { state: formData });
-  };
+    const userName = username;
+    const img = avatar;
+    navigate("/multigame", { state: {formData, userName, img }});
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && choixMots.trim() !== "") {
@@ -233,7 +260,8 @@ function MultiShare() {
 
 
               <div className="right">
-          <div className="title">Joueurs</div>
+          <div className="title">Joueurs    
+          </div>
           <div className="container_ul">
             <ul>
               {players.map((player, index) => (

@@ -14,7 +14,6 @@ import click from '../assets/music/click.mp3';
 export const ChatBox = (props: { player: Player, messages: Array<Message> }) => {
 
     const [visibility, showchat] = useState(false);
-    console.log("visibility:" + visibility);
 
     return <>
         {visibility ?
@@ -374,7 +373,6 @@ export const RealChatSender = (props: { onMessageEntered: (message: string) => v
 export const RealChatBox = (props: {messages: Array<Messaged>, handleMessageEntered:(Message:string)=>void, avatar?: string}) => {
 
   const [visibility, showchat] = useState(false);
-  console.log("visibility:" + visibility);
 
   
 
@@ -420,6 +418,8 @@ export interface RealChatManager {
   setPlayersListener(listener: (players: string[]) => void): void;
 
   sendMessage(content: string, photo: string): void;
+
+  sendGameStart(): void;
 
   close(): void;
 }

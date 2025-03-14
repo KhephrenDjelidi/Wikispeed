@@ -1,7 +1,7 @@
 import Damien from "./assets/avatar/Avatar_damien.svg";
 import mine from './assets/artifact/mine.svg'
 import map from './assets/artifact/map.svg'
-import {ChatBox} from "./component/Chat.tsx";
+import {ChatBox, FinChatter} from "./component/Chat.tsx";
 import { ArticleList, Inventory, PlayerInfo, Timer } from './component/EventComponent'
 import './style/wikispeed.css'
 import './style/timer.css'
@@ -11,11 +11,15 @@ import { Background } from "./assets/back.tsx";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { sharedChatManager } from "./chatManager.ts";
+
 
 function MultiGame() {
   const location = useLocation();
-  const formData = location.state;
-
+  const formData = location.state.formData;
+  const username = location.state.userName;
+  const avatar = location.state.img;
+ 
     // Si les données sont absentes ou invalides, redirige l'utilisateur ou montre un message d'erreur
     if (!formData) {
       return <div>Erreur: Aucune donnée trouvée.</div>;
@@ -58,8 +62,8 @@ function MultiGame() {
 
     return (
         <>
-        <ChatBox messages={[{player:{id:1,name:"Damqdqsdqsdqdqsdien",time:200,avatar:Damien,score:20},text:"Salut"},{player:{id:2,name:"lksjdklqjsdkq",time:200,avatar:Damien,score:20},text:"nnn"},{player:{id:1,name:"Damqdqsdqsdqdqsdien",time:200,avatar:Damien,score:20},text:"Salut"}]} player={{id:1,name:"Damqdqsdqsdqdqsdien",time:200,avatar:Damien,score:20}}/>
-        <section className='main-page game'>
+        <FinChatter chatManager={sharedChatManager} initialUserName={username} avatar={avatar} />
+    <section className='main-page game'>
         <figure className='logo-solo'>
           <svg width="30vw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 400">
             <polygon points="40,10 130,1 70,160 100,160 5,390 35,200 0,200" stroke="#000000" stroke-width="7px" fill="#FDB813"/>

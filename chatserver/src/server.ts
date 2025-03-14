@@ -2,6 +2,8 @@
 import WebSocket from 'ws';
 
 export interface Room {
+  parameters: any;
+  isPlaying: boolean;
   id: string;
   members: Map<string, WebSocket>; // usernames linked to their websocket
 }
@@ -23,6 +25,8 @@ wss.on('connection', (ws: WebSocket) => {
       switch (data.kind) {
         case 'create_room':
           const room: Room = {
+            parameters:null,
+            isPlaying: false,
             id: roomId,
             members: new Map(),
           };
@@ -59,6 +63,34 @@ wss.on('connection', (ws: WebSocket) => {
           break;
           ws.close();
 
+          case 'start_game':
+            if (currentRoom ) {
+              currentRoom.isPlaying = true;
+              currentRoom.members.forEach((memberWs, username) => {
+                  memberWs.send(JSON.stringify({
+                    kind: 'start-game',
+                    isPlay: true,
+                  }));
+  
+              });
+            }
+            console.log(data);
+            break;
+
+            case 'parameters':
+              if (currentRoom ) {
+                currentRoom.parameters = data.parameters;
+                currentRoom.members.forEach((memberWs, username) => {
+                    memberWs.send(JSON.stringify({
+                      kind: 'parameters-for-game',
+                      isPlay: true,
+                    }));
+    
+                });
+              }
+              console.log(data);
+              break;
+  
         case 'send_message':
           if (currentRoom && currentUser) {
             currentRoom.members.forEach((memberWs, username) => {

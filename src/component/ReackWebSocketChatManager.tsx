@@ -5,6 +5,7 @@ export class RealWebSocketChatManager implements RealChatManager {
   private socket: WebSocket | null = null;
   private messageListener: (message: Messaged) => void = () => {};
   private playersListener: (players: string[]) => void = () => {};
+  private isGameListener: (isGame: boolean) => void = () => {};
   private roomID :string = '';
 
 
@@ -24,7 +25,11 @@ export class RealWebSocketChatManager implements RealChatManager {
       
       if (data.kind === 'room_joined' || data.kind === 'user_joined' || data.kind === 'user_left' || data.kind === 'room_created' ) {
         this.playersListener(data.users || []);
-      } else {
+      }else if (data.kind === 'start-game') {
+        console.log("start-game", data.isPlay);
+        this.isGameListener(data.isPlay);
+      }
+      else {
         const message_kind = data.kind;
         const message: Messaged = {
           kind: message_kind,
@@ -110,6 +115,10 @@ export class RealWebSocketChatManager implements RealChatManager {
     this.playersListener = listener;
   }
 
+  setIsGameListener(listener: (isGame: boolean) => void): void {
+    this.isGameListener = listener;
+  }
+
   sendMessage(content: string, photo: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({
@@ -122,6 +131,23 @@ export class RealWebSocketChatManager implements RealChatManager {
       console.error("WebSocket is not open");
     }
   }
+  sendGameStart(): void {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      const message = JSON.stringify({
+        kind: "start_game",
+      });
+      this.socket.send(message);
+  }
+}
+sendParameters(parameters: any): void {
+  if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    const message = JSON.stringify({
+      kind: "parameters",
+      parameters: parameters,
+    });
+    this.socket.send(message);
+  }
+}
 
   close(): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {

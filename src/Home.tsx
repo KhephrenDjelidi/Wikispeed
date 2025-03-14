@@ -55,12 +55,7 @@ function Home() {
 
   return (
     <>
-      <button
-        disabled={!isInputValid} // Désactive le bouton si inputValue est vide
-        onClick={() => navigateToPage('./solocreation' )}
-      >
-        Jouer
-      </button>
+      
       
       <SoundPlayer hoverSound={monster} clickSound={click} volume={0.3}>                
         <div id="monster_1">

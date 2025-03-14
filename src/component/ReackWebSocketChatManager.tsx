@@ -6,6 +6,7 @@ export class RealWebSocketChatManager implements RealChatManager {
   private messageListener: (message: Messaged) => void = () => {};
   private playersListener: (players: string[]) => void = () => {};
   private isGameListener: (isGame: boolean) => void = () => {};
+  private parametersListener: (parameters:  Object) => void = () => {};
   private roomID :string = '';
 
 
@@ -28,6 +29,9 @@ export class RealWebSocketChatManager implements RealChatManager {
       }else if (data.kind === 'start-game') {
         console.log("start-game", data.isPlay);
         this.isGameListener(data.isPlay);
+      }else if (data.kind === 'parameters-for-game') {
+        console.log("parameters-for-game", data.parameters);
+        this.parametersListener(data.parameters);
       }
       else {
         const message_kind = data.kind;
@@ -119,6 +123,10 @@ export class RealWebSocketChatManager implements RealChatManager {
     this.isGameListener = listener;
   }
 
+  setParametersListener(listener: (parameters: Object) => void): void {
+    this.parametersListener = listener;
+  }
+
   sendMessage(content: string, photo: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({
@@ -139,7 +147,7 @@ export class RealWebSocketChatManager implements RealChatManager {
       this.socket.send(message);
   }
 }
-sendParameters(parameters: any): void {
+async sendParameters(parameters: any): Promise<void> {
   if (this.socket && this.socket.readyState === WebSocket.OPEN) {
     const message = JSON.stringify({
       kind: "parameters",

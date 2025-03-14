@@ -83,7 +83,7 @@ wss.on('connection', (ws: WebSocket) => {
                 currentRoom.members.forEach((memberWs, username) => {
                     memberWs.send(JSON.stringify({
                       kind: 'parameters-for-game',
-                      isPlay: true,
+                      parameters: data.parameters,
                     }));
     
                 });

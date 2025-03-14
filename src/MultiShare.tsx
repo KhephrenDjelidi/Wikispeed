@@ -31,7 +31,7 @@ function MultiShare() {
   const [wordsList, setWordsList] = useState<string[]>([]); // Liste des mots ajoutés
   const [copied, setCopied] = useState(false);
   const [isGame, setIsGame] = useState(false);
-  const [parameters, setParameters] = useState<any>(null);
+  const [parameters, setParameters] = useState<Object>({});
   let owner = players[0];
   console.log("Owner:", owner);
   console.log("Username:", username);
@@ -46,6 +46,13 @@ function MultiShare() {
     });
     sharedChatManager.setIsGameListener((isGame) => {
       setIsGame(isGame);
+    });
+    sharedChatManager.setParametersListener((parameters) => {
+      setParameters(parameters);
+      console.log("ezezzezezeez:", parameters);
+      const userName = username;
+    const img = avatar;
+      navigate("/multigame", { state: {parameters, userName, img }});
     });
   }, []);
 
@@ -76,25 +83,28 @@ function MultiShare() {
   };
 
   const handleGameStart = () => {
-    /*const formData = {
+    const formData = {
       nombreArticles,
       artefacts,
       temps,
       randomMots,
       choixMots,
       wordsList
-    };*/
-    const formData = {
+    };
+    console.log("formData:", formData);
+    /*const formData = {
       nombreArticles:"3",
       artefacts:"OUI",
       temps:"10",
       randomMots: "OUI",
       choixMots: "mot",
       wordsList: ["mot1","mot2","mot3"]
-    };
-    const userName = username;
-    const img = avatar;
-    navigate("/multigame", { state: {formData, userName, img }});
+    };*/
+    sharedChatManager.sendParameters(formData);
+    
+    
+    console.log("parameterssssssssssfsdfs:", parameters);
+   // navigate("/multigame", { state: {parameters, userName, img }});
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

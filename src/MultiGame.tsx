@@ -16,7 +16,8 @@ import { sharedChatManager } from "./chatManager.ts";
 
 function MultiGame() {
   const location = useLocation();
-  const formData = location.state.formData;
+  console.log("location", location);
+  const formData = location.state.parameters;
   const username = location.state.userName;
   const avatar = location.state.img;
  
@@ -24,7 +25,7 @@ function MultiGame() {
     if (!formData) {
       return <div>Erreur: Aucune donnée trouvée.</div>;
     }
-  
+    console.log("formData:", formData);
     const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = formData;
   
     useEffect(() => {

@@ -55,8 +55,6 @@ function Home() {
 
   return (
     <>
-      
-      
       <SoundPlayer hoverSound={monster} clickSound={click} volume={0.3}>                
         <div id="monster_1">
           <img className="monsters mleft-rotate" id="m1" src={images.benjamin} alt="Monstre Benjamin" />

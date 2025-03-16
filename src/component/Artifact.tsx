@@ -2,13 +2,23 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 
 export interface Artifact{
-    name:string
-    description:string
-img:string  }
+    name: string
+    description: string
+    img: string
+    onActivate?: () => void
+}
 
 export const Artifacts = (props:{artifact:Artifact}) =>{
     const [description, setDescription] = useState(false);
     console.log("description:" + description);
+
+    const handleActivate = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (props.artifact.onActivate) {
+            props.artifact.onActivate();
+        }
+        setDescription(false);
+    };
 
     return <div className='artifact-border' onClick={ () =>{setDescription(true) }}>
         {description && createPortal(<div className="artifact-description manjari" onClick={()=>setDescription(false)}> 
@@ -16,8 +26,10 @@ export const Artifacts = (props:{artifact:Artifact}) =>{
                         <figure> <img src={props.artifact.img} alt={props.artifact.name} /></figure>
                     </div>
                     <div className="title-description"> {props.artifact.name}</div>
-                    <p>          {props.artifact.description}</p>
-                    <div className="artifact-active" onClick={ (e) =>{ e.stopPropagation(); setDescription(false)} }> <span className="manjari">ACTIVER</span> </div>
+                    <p>{props.artifact.description}</p>
+                    <div className="artifact-active" onClick={handleActivate}> 
+                        <span className="manjari">ACTIVER</span> 
+                    </div>
              </div>
              ,document.body)}
                 <figure> <img src={props.artifact.img} alt={props.artifact.name} /></figure>

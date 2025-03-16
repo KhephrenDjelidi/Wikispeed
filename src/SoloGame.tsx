@@ -1,5 +1,6 @@
 import mine from './assets/artifact/mine.svg';
 import map from './assets/artifact/map.svg';
+import escargot from './assets/artifact/escargot.svg';
 import benjamin from './assets/monster/benjamin.png';
 import { ArticleList, Inventory, Timer } from './component/EventComponent';
 import './style/wikispeed.css';
@@ -7,10 +8,11 @@ import './style/timer.css';
 import './style/game.css';
 import { ArticleDisplayer } from './component/Article';
 import { Background } from "./assets/back.tsx";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { title } from 'process';
+import { SnailArtifact } from './component/SnailArtifact';
 
 function SoloGame() {
   const location = useLocation();
@@ -25,22 +27,34 @@ function SoloGame() {
   const [soloPlayer, setplayer] = useState(player);
   let currentHistory = soloPlayer.history;
 
+  const [hasSnailArtifact, setHasSnailArtifact] = useState(false);
+  
+  const activateSnailArtifactRandomly = useCallback(() => {
+    const randomValue = Math.random();
+    return randomValue < 0.1; 
+  }, []);
+
+  const articlesMap: Map<string, boolean> = useMemo(() => {
+    return new Map(wordsList.map((article: string) => [article, false]));
+  }, [wordsList]);
+  
+  const randomTitle = useMemo(() => {
+    return wordsList.length > 0 ? wordsList[Math.floor(Math.random() * wordsList.length)] : "Aucun mot disponible";
+  }, [wordsList]);
+  
+  const [articleTitle, setArticleTitle] = useState(randomTitle);
+  const [updatedArticlesMap, setArticlesMap] = useState<Map<string, boolean>>(articlesMap);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     console.log("Données reçues:", formData);
     if (choixMots) {
       setArticleTitle(choixMots);
     }
-  }, [formData]);
+  }, [formData, choixMots]);
 
-  const articlesMap: Map<string, boolean> = new Map(wordsList.map((article: string) => [article, false]));
-  const randomTitle = wordsList.length > 0 ? wordsList[Math.floor(Math.random() * wordsList.length)] : "Aucun mot disponible";
-  
-  const [articleTitle, setArticleTitle] = useState(randomTitle);
-  const [updatedArticlesMap, setArticlesMap] = useState(articlesMap);
-
-  const navigate = useNavigate();
-
-  const updateArticleStatus = (title: string) => {
+  const updateArticleStatus = useCallback((title: string) => {
     setArticlesMap((prevMap) => {
       const updatedMap = new Map(prevMap);
       if (updatedMap.has(title)) {
@@ -48,10 +62,21 @@ function SoloGame() {
       }
       return updatedMap;
     });
-  };
+  }, []);
 
-  currentHistory.push(randomTitle);
+  const handleArticleChange = useCallback((newTitle: string) => {
+    if (artefacts === "OUI" && activateSnailArtifactRandomly()) {
+      setHasSnailArtifact(true);
+    } else {
+      setHasSnailArtifact(false);
+    }
+    
+    setArticleTitle(newTitle);
+  }, [artefacts, activateSnailArtifactRandomly]);
 
+  useEffect(() => {
+    currentHistory.push(randomTitle);
+  }, [currentHistory, randomTitle]);
 
   useEffect(() => {
     const allArticlesFound = Array.from(updatedArticlesMap.values()).every(status => status === true);
@@ -75,11 +100,12 @@ function SoloGame() {
           <div className='game-main'>
             <ArticleDisplayer
               title={articleTitle}
-              setTitle={setArticleTitle}
+              setTitle={handleArticleChange}
               updateArticleStatus={updateArticleStatus}
+              hasSnailArtifact={hasSnailArtifact}
             />
             <div className='game-main-details'>
-              <ArticleList names={updatedArticlesMap } />
+              <ArticleList names={updatedArticlesMap} />
               <figure className="monster">
                 <img src={benjamin} alt="benjamin" />
               </figure>
@@ -98,29 +124,14 @@ function SoloGame() {
               <path d="M111.675 -0.000378409C165.925 0.28796 237 19.4997 222 71.4994C206.999 123.499 165.925 114.16 111.674 113.872C57.4239 113.584 22.5001 123 2.99974 71.4993C-12 19 57.4247 -0.288717 111.675 -0.000378409Z" fill=" #4943C6" />
             </svg>
 
-            <Inventory artifact1={{ name: 'mine', description: '', img: mine }} artifact2={{ name: 'map', description: '', img: map }} isExist={artefacts} />
+            <Inventory 
+              artifact1={{ name: 'mine', description: '', img: mine }} 
+              artifact2={{ name: 'map', description: '', img: map }} 
+              isExist={artefacts} 
+            />
           </div>
         </div>
       </section>
-
-      {/* Affichage des données récupérées */}
-      <div className="data-display">
-        <h2>Données récupérées :</h2>
-        <p><strong>Nombre d'articles :</strong> {nombreArticles}</p>
-        <p><strong>Artefacts :</strong> {artefacts}</p>
-        <p><strong>Temps :</strong> {temps}</p>
-        <p><strong>Mots aléatoires :</strong> {randomMots}</p>
-        <p><strong>Choix de mots :</strong> {wordsList.join(', ')}</p> {/* Affichage de la liste des mots */}
-      </div>
-
-      <div>
-                      {soloPlayer.avatar},
-                      {soloPlayer.name},
-                      {soloPlayer.id}
-                      {soloPlayer.history}
-
-                      {/* {setplayer({id:1,name: soloPlayer.username, avatar:soloPlayer.avatar, history : currentHistory})} */}
-                    </div>
       <Background />
     </>
   );

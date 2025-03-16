@@ -1,57 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
+import { useSnailArtifact, SnailArtifactOverlay, SnailTimer } from './SnailArtifact';
 
 interface ArticleDisplayerProps {
   title: string;
   setTitle: (newTitle: string) => void;
 
   updateArticleStatus: (title: string) => void;
+  hasSnailArtifact?: boolean;
 }
 
-export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus }: ArticleDisplayerProps) => {
+const MemoizedSnailTimer = memo(SnailTimer);
+const MemoizedSnailArtifactOverlay = memo(SnailArtifactOverlay);
+
+export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnailArtifact = false }: ArticleDisplayerProps) => {
   const [content, setContent] = useState<string>('');
+  const { isActive, activateSnail, remainingTime } = useSnailArtifact();
 
-  useEffect(() => {
-    const fetchArticle = async () => {
-      const response = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/html/${title}`);
-      const data = await response.text();
-      const cleanedContent = cleanArticle(data);
-      setContent(cleanedContent);
-
-      // Mettre à jour le statut de l'article dans la Map
-      updateArticleStatus(title);
-    };
-    fetchArticle();
-  }, [title, updateArticleStatus]);
-
-  useEffect(() => {
-    const articleTitle = document.getElementById("article_tit");
-    if (articleTitle) {
-      articleTitle.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [title]);
-
-  useEffect(() => {
-    const container = document.querySelector('.article-content');
-    if (!container) return;
-
-    const handleClick = (event: Event) => {
-      const target = event.target as HTMLAnchorElement;
-      if (target.tagName === 'A') {
-        event.preventDefault();
-        const newTitle = target.getAttribute("title");
-        if (newTitle) {
-          setTitle(newTitle);
-        }
-      }
-    };
-
-    container.addEventListener('click', handleClick);
-    return () => {
-      container.removeEventListener('click', handleClick);
-    };
-  }, [content]);
-
-  const cleanArticle = (html: string) => {
+  const cleanArticle = useCallback((html: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
@@ -106,12 +71,87 @@ export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus }: Artic
     cleanedContent += doc.body.innerHTML;
 
     return cleanedContent;
-  };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchArticle = async () => {
+      try {
+        const response = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/html/${title}`);
+        const data = await response.text();
+        const cleanedContent = cleanArticle(data);
+        
+        if (isMounted) {
+          setContent(cleanedContent);
+          updateArticleStatus(title);
+          
+          if (hasSnailArtifact) {
+            activateSnail();
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'article:", error);
+      }
+    };
+    
+    fetchArticle();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [title, updateArticleStatus, hasSnailArtifact, activateSnail, cleanArticle]);
+
+  useEffect(() => {
+    const articleTitle = document.getElementById("article_tit");
+    if (articleTitle) {
+      articleTitle.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [title]);
+
+  useEffect(() => {
+    const container = document.querySelector('.article-content');
+    if (!container) return;
+
+    const handleClick = (event: Event) => {
+      const target = event.target as HTMLAnchorElement;
+      if (target.tagName === 'A') {
+        if (isActive) {
+          event.preventDefault();
+          return;
+        }
+        
+        event.preventDefault();
+        const newTitle = target.getAttribute("title");
+        if (newTitle) {
+          setTitle(newTitle);
+        }
+      }
+    };
+
+    container.addEventListener('click', handleClick);
+    return () => {
+      container.removeEventListener('click', handleClick);
+    };
+  }, [content, isActive, setTitle]);
+
+  useEffect(() => {
+    const container = document.querySelector('.article-content');
+    if (!container) return;
+
+    if (isActive) {
+      container.classList.add('links-disabled');
+    } else {
+      container.classList.remove('links-disabled');
+    }
+  }, [isActive]);
 
   return (
     <div className="article-container">
       <p id="article_tit" className="article_title">{title}</p>
       <div className="article-content" dangerouslySetInnerHTML={{ __html: content }} />
+      <MemoizedSnailArtifactOverlay isActive={isActive} remainingTime={remainingTime} />
+      <MemoizedSnailTimer isActive={isActive} remainingTime={remainingTime} />
     </div>
   );
 };

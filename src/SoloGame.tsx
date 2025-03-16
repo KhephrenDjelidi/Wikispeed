@@ -10,6 +10,7 @@ import { Background } from "./assets/back.tsx";
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { title } from 'process';
 
 function SoloGame() {
   const location = useLocation();
@@ -20,7 +21,9 @@ function SoloGame() {
     return <div>Erreur: Aucune donnée trouvée.</div>;
   }
 
-  const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = formData;
+  const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList, player } = formData;
+  const [soloPlayer, setplayer] = useState(player);
+  let currentHistory = soloPlayer.history;
 
   useEffect(() => {
     console.log("Données reçues:", formData);
@@ -46,6 +49,9 @@ function SoloGame() {
       return updatedMap;
     });
   };
+
+  currentHistory.push(randomTitle);
+
 
   useEffect(() => {
     const allArticlesFound = Array.from(updatedArticlesMap.values()).every(status => status === true);
@@ -106,6 +112,15 @@ function SoloGame() {
         <p><strong>Mots aléatoires :</strong> {randomMots}</p>
         <p><strong>Choix de mots :</strong> {wordsList.join(', ')}</p> {/* Affichage de la liste des mots */}
       </div>
+
+      <div>
+                      {soloPlayer.avatar},
+                      {soloPlayer.name},
+                      {soloPlayer.id}
+                      {soloPlayer.history}
+
+                      {/* {setplayer({id:1,name: soloPlayer.username, avatar:soloPlayer.avatar, history : currentHistory})} */}
+                    </div>
       <Background />
     </>
   );

@@ -9,6 +9,7 @@ import { LogoTitle } from "./component/Component";
 import { PlayGame } from "./component/GameComponent.tsx";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
+import { PlayerInfo } from "./component/EventComponent.tsx";
 
 function SoloCreation() {
   const navigate = useNavigate();
@@ -16,7 +17,10 @@ function SoloCreation() {
   if (!location.state) {
     console.log("Aucun état trouvé");}
   const username = location.state.username;
+  const avatar = location.state.avatar;
   console.log("Nom d'utilisateur:", username);
+  console.log("Avatar:", avatar);
+  const player ={id:1,name: username,avatar:avatar, history:[]};
 
 
   const [nombreArticles, setNombreArticles] = useState<string>("");
@@ -36,7 +40,8 @@ function SoloCreation() {
       temps,
       randomMots,
       choixMots,
-      wordsList
+      wordsList,
+      player
     };
     navigate("/sologame", { state: formData });
   };
@@ -187,6 +192,8 @@ function SoloCreation() {
                 </div>
               </div>
             </div>
+
+
 
             <div className="container_button">
               <PlayGame link="sologame" onClick={handlePlayGame} />

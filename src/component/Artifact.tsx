@@ -10,7 +10,6 @@ export interface Artifact{
 
 export const Artifacts = (props:{artifact:Artifact}) =>{
     const [description, setDescription] = useState(false);
-    console.log("description:" + description);
 
     const handleActivate = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -42,5 +41,6 @@ export const Artifacts = (props:{artifact:Artifact}) =>{
             )}
       </div>
 }
+
 
 

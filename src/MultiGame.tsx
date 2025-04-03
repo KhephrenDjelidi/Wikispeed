@@ -12,22 +12,29 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { sharedChatManager } from "./chatManager.ts";
+import { Player } from "./types/Player.ts";
 
 
 function MultiGame() {
   const location = useLocation();
-  console.log("location", location);
   const formData = location.state.parameters;
   const username = location.state.userName;
   const avatar = location.state.img;
+  const map = location.state.playerMap;
+ // console.log("map:", map);
  
     // Si les données sont absentes ou invalides, redirige l'utilisateur ou montre un message d'erreur
     if (!formData) {
       return <div>Erreur: Aucune donnée trouvée.</div>;
     }
-    console.log("formData:", formData);
+    
+    // console.log("formData:", formData);
     const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = formData;
-  
+
+    if(nombreArticles===0){
+      console.log(formData);
+      return <div>Loading.</div>;
+    }else{
     useEffect(() => {
       console.log("Données reçues:", formData);
       if (choixMots) {
@@ -41,8 +48,17 @@ function MultiGame() {
     const [articleTitle, setArticleTitle] = useState(randomTitle);
     const [updatedArticlesMap, setArticlesMap] = useState<Map<string, boolean>>(articlesMap);
     const [isOver, setIsOver] = useState(false);
-
+    const [isEnd, setEndGame] = useState(false);
     const navigate = useNavigate();
+
+    const getPlayerIdByName = (playersMap: Map<number, string>, name: string): number  => {
+      for (const [id, playerName] of playersMap.entries()) {
+        if (playerName === name) {
+          return id; // Retourne l'identifiant trouvé
+        }
+      }
+      return -1// Retourne undefined si le joueur n'est pas trouvé
+    };
   
     const updateArticleStatus = (title: string) => {
       setArticlesMap((prevMap) => {
@@ -53,15 +69,31 @@ function MultiGame() {
         return updatedMap;
       });
     };
-  
+
     useEffect(() => {
       const allArticlesFound = Array.from(updatedArticlesMap.values()).every(status => status === true);
       if (allArticlesFound) {
-        navigate('/endgame');
+        sharedChatManager.sendFinishGame();
+        
+         
+      
       }
+   
     }, [updatedArticlesMap, navigate]);
  
-    
+    useEffect(()=>{
+       sharedChatManager.setIsEndListener((isEnd) => {
+          setEndGame(isEnd);
+       });
+
+      if(isEnd){
+
+        const player:Player = {id:getPlayerIdByName(map,username),name:username,time:200,avatar:avatar,score:20,history:[],articles:new Map()}
+        console.log("player", player);
+
+        navigate('/endgame');
+         }
+    })
 
     return (
         <>
@@ -124,5 +156,5 @@ function MultiGame() {
         </>
   )
 }
-
+}
 export default MultiGame

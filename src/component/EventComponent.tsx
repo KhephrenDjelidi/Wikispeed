@@ -13,7 +13,7 @@ export function Timer(props: { time: number, onTimeUp: (isOver :boolean) => void
     useEffect(() => {
         if (seconds <= 0) {
             props.onTimeUp(true);
-            console.log("Time is up!");
+//            console.log("Time is up!");
             return;
         }
     }

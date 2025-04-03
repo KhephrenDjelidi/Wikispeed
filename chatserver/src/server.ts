@@ -1,13 +1,26 @@
 
 import WebSocket from 'ws';
 
+export interface Player {
+  id: number;
+  name: string;
+  time: number | null;
+  avatar: string;
+  score: number | null;
+  history: string[];
+  articles: Map<string, boolean>;
+}
+
+
+
 export interface Room {
   parameters: any;
   isPlaying: boolean;
+  end : boolean;
   id: string;
+  players: Player[];
   members: Map<string, WebSocket>; // usernames linked to their websocket
 }
-
 let rooms = new Map<string, Room>();
 
 const wss = new WebSocket.Server({ port: 2025 });
@@ -28,6 +41,8 @@ wss.on('connection', (ws: WebSocket) => {
             parameters:null,
             isPlaying: false,
             id: roomId,
+            players: [],
+            end: false,
             members: new Map(),
           };
           rooms.set(roomId, room);
@@ -77,6 +92,20 @@ wss.on('connection', (ws: WebSocket) => {
             console.log(data);
             break;
 
+            case 'finish_game':
+            if (currentRoom ) {
+              currentRoom.isPlaying = true;
+              currentRoom.members.forEach((memberWs, username) => {
+                  memberWs.send(JSON.stringify({
+                    kind: 'finish-game',
+                    end: true,
+                  }));
+  
+              });
+            }
+            console.log(data);
+            break;
+
             case 'parameters':
               if (currentRoom ) {
                 currentRoom.parameters = data.parameters;
@@ -114,6 +143,39 @@ wss.on('connection', (ws: WebSocket) => {
           console.log(data);
           break;
 
+        case 'update_article_status':
+          if (currentRoom && currentUser) {
+            currentRoom.members.forEach((memberWs, username) => {
+              if (username !== currentUser) {
+                memberWs.send(JSON.stringify({
+                  kind: 'update_article_status',
+                  title: data.title,
+                  status: data.status,
+                  sender: currentUser,
+                }));
+              }else{
+                memberWs.send(JSON.stringify({
+                  kind: 'update_article_status',
+                  title: data.title,
+                  status: data.status,
+                  sender: currentUser,
+                }));
+              }
+            });
+          }
+
+        case 'player_at_the_end':
+          if (currentRoom && currentUser) {
+            currentRoom.members.forEach((memberWs, username) => {
+                memberWs.send(JSON.stringify({
+                  kind: 'player-finished',
+                  player: data.player,
+                  sender: currentUser,
+               }));
+              }
+              
+            );
+          }
         case 'disconnect':
           if (currentRoom && currentUser) {
             currentRoom.members.delete(currentUser);

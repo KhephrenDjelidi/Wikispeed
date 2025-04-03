@@ -32,13 +32,27 @@ function MultiShare() {
   const [copied, setCopied] = useState(false);
   const [isGame, setIsGame] = useState(false);
   const [parameters, setParameters] = useState<Object>({});
+
+  const [playerMap, setPlayersMap] = useState<Map<number, string>>(new Map());
   let owner = players[0];
+  console.log("jesuis une liste de joueurs",players);
   console.log("Owner:", owner);
   console.log("Username:", username);
   console.log("Avatar:", avatar);
 
 
   console.log("isGame:", isGame);
+
+
+  const fillPlayersMap = (playersList: string[]): Map<number, string> => {
+    const playersMap = new Map<number, string>();
+    
+    playersList.forEach((player, index) => {
+      playersMap.set(index, player);
+    });
+  
+    return playersMap;
+  };
 
   useEffect(() => {
     sharedChatManager.setPlayersListener((players) => {
@@ -52,13 +66,22 @@ function MultiShare() {
       console.log("ezezzezezeez:", parameters);
       const userName = username;
     const img = avatar;
-      navigate("/multigame", { state: {parameters, userName, img }});
+      console.log("playersMap:", playerMap);  
+      navigate("/multigame", { state: {parameters, userName, img,playerMap} });
     });
-  }, []);
+  }, [playerMap]);
 
+  useEffect(() => {
+    if (copied) {
+      console.log("Room ID copied to clipboard:", roomId);
+    }
+  }
+  , [isGame]);
 
   useEffect(() => {
     if (isGame) {
+      setPlayersMap(fillPlayersMap(players));
+
       handleGameStart();
     }
   }, [isGame]);
@@ -82,30 +105,43 @@ function MultiShare() {
    
   };
 
-  const handleGameStart = () => {
+  
+  const handleGameStart = async () => {
     const formData = {
       nombreArticles,
       artefacts,
       temps,
       randomMots,
       choixMots,
-      wordsList
+      wordsList,// Initialisé vide
     };
-    console.log("formData:", formData);
-    /*const formData = {
-      nombreArticles:"3",
-      artefacts:"OUI",
-      temps:"10",
-      randomMots: "OUI",
-      choixMots: "mot",
-      wordsList: ["mot1","mot2","mot3"]
-    };*/
+
+    const fetchRandomArticles = async () => {
+      const articles = [];
+  
+      for (let i = 0; i < formData.nombreArticles; i++) {
+        try {
+          const response = await fetch("https://fr.wikipedia.org/api/rest_v1/page/random/summary");
+          const data = await response.json();
+          if (data?.title) articles.push(data.title);
+        } catch (error) {
+          console.error("Erreur lors de la récupération d'un article Wikipedia:", error);
+          articles.push(`Article ${i + 1}`);
+        }
+      }
+  
+      console.log("articles:", articles); // ✅ Ce log fonctionnera maintenant
+      return articles;
+    };
+    if(randomMots === true){
+    formData.wordsList = await fetchRandomArticles(); // ✅ Attendre la fin de la récupération des articles
+    }else{
+      await fetchRandomArticles();
+    }
+    console.log("formData:", formData); // ✅ Maintenant, wordsList contient les bons articles
     sharedChatManager.sendParameters(formData);
-    
-    
-    console.log("parameterssssssssssfsdfs:", parameters);
-   // navigate("/multigame", { state: {parameters, userName, img }});
-  }
+  };
+  
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && choixMots.trim() !== "") {

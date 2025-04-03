@@ -92,3 +92,51 @@ export const Game = () => {
         )
     }
 }
+
+export const MultiGame = () => {
+
+
+  const [gameState, setGameState] = useLocalStorage("gameState", "build");
+  const setting = {
+      nombreArticles: 0,
+      artefacts: false,
+      temps: 0,
+      randomMots: false,
+      choixMots: "",
+      wordsList: [],
+  }
+
+  const [game, setGame] = useLocalStorage("game", {
+      players:[],
+      currentPlayer: 0,
+      settings: setting,
+      end: false,
+  });
+
+  if(gameState === "build"){
+      return(
+          <SoloCreation game={game} onChange={setGame} onChangeGameState={setGameState}/>
+      )
+  }
+  else if(gameState === "loading"){
+      return(
+          <Loading  game={game} onChange={setGame} onChangeGameState={setGameState}/>
+      )
+  }
+  else if(gameState === "game"){
+    if(game.players[0].articles.size === 0){
+      game.players[0] = {
+        ...game.players[0],
+        articles: new Map(game.settings.wordsList.map((article: string) => [article, false])),
+      }
+    }
+      return(
+          <SoloGame game={game} onChange={setGame} onChangeGameState={setGameState}/>
+      )
+  }
+  else {
+      return(
+          <EndGameSolo game={game}  onChangeGameState={setGameState}/>
+      )
+  }
+}

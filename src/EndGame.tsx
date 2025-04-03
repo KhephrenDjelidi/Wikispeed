@@ -9,9 +9,18 @@ import images from './assets/monster/images'
 
 import './style/wikispeed.css'
 import { Background } from './assets/back'
+import { Player } from './types/Player'
+import { sharedChatManager } from "./chatManager.ts";
+
 
 function EndGame(){
-    const ranking=[{id:1,name:"Damqdqsdqsdqdqsdien",time:200,avatar:Damien,score:20},{id:2,name:"Damien",time:200,avatar:Damien,score:20},{id:3,name:"Damien",time:200,avatar:Damien,score:20},{id:4,name:"Damien",time:200,avatar:Damien,score:20},{id:5,name:"Damien",time:200,avatar:Damien,score:20},{id:6,name:"Damien",time:200,avatar:Damien,score:20}];
+    const rank:Player[] = [
+        {id:1,name:"Damqdqsdqsdqdqsdien",time:200,avatar:Damien,score:20,history:[],articles:new Map()},
+        {id:2,name:"Damien",time:200,avatar:Damien,score:20,history:[],articles:new Map()},
+        {id:3,name:"Damien",time:200,avatar:Damien,score:20,history:[],articles:new Map()},
+        {id:4,name:"Damien",time:200,avatar:Damien,score:20,history:[],articles:new Map()},
+        {id:5,name:"Damien",time:200,avatar:Damien,score:20,history:[],articles:new Map()},
+    ]
     return <>
     <Background/>
         <main>
@@ -27,10 +36,10 @@ function EndGame(){
 
         <CreditButton/>
     <LogoTitle/>
-        <Podium ranking={ranking}></Podium>
+        <Podium ranking={rank}></Podium> 
     <BottomRedirection content="See the ranking" link="#bottom"/>
             </section>
-        <Ranking ranking={ranking}/>
+         <Ranking ranking={rank}/> 
         </main>
     </>
 }

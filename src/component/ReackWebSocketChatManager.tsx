@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ChatManager,Messaged, RealChatManager } from "./Chat";
+import { Player } from '../types/Player';
 
 export class RealWebSocketChatManager implements RealChatManager {
   private socket: WebSocket | null = null;
   private messageListener: (message: Messaged) => void = () => {};
   private playersListener: (players: string[]) => void = () => {};
   private isGameListener: (isGame: boolean) => void = () => {};
+
+  private endListener: (isGame: boolean) => void = () => {};
   private parametersListener: (parameters:  Object) => void = () => {};
   private roomID :string = '';
 
@@ -29,7 +32,10 @@ export class RealWebSocketChatManager implements RealChatManager {
       }else if (data.kind === 'start-game') {
         console.log("start-game", data.isPlay);
         this.isGameListener(data.isPlay);
-      }else if (data.kind === 'parameters-for-game') {
+      }else if(data.kind === 'finish-game'){
+        console.log("finish-game", data.end);
+        this.endListener(data.end);}
+      else if (data.kind === 'parameters-for-game') {
         console.log("parameters-for-game", data.parameters);
         this.parametersListener(data.parameters);
       }
@@ -123,6 +129,10 @@ export class RealWebSocketChatManager implements RealChatManager {
     this.isGameListener = listener;
   }
 
+  setIsEndListener(listener: (isGame: boolean) => void): void {
+    this.endListener = listener;
+  }
+
   setParametersListener(listener: (parameters: Object) => void): void {
     this.parametersListener = listener;
   }
@@ -147,6 +157,16 @@ export class RealWebSocketChatManager implements RealChatManager {
       this.socket.send(message);
   }
 }
+
+sendFinishGame(): void {
+  if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    console.log("sendFinishGame");
+    const message = JSON.stringify({
+      kind: "finish_game",
+    });
+    this.socket.send(message);
+  }
+}
 async sendParameters(parameters: any): Promise<void> {
   if (this.socket && this.socket.readyState === WebSocket.OPEN) {
     const message = JSON.stringify({
@@ -156,6 +176,17 @@ async sendParameters(parameters: any): Promise<void> {
     this.socket.send(message);
   }
 }
+
+async sendPlayer(player: Player): Promise<void> {
+  if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    const message = JSON.stringify({
+      kind: "player_at_the_end",
+      player: player,
+    });
+    this.socket.send(message);
+  }
+}
+
 
   close(): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {

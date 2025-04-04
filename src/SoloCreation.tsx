@@ -7,12 +7,10 @@ import { Background } from "./assets/back.tsx";
 import images from "./assets/monster/images";
 import { LogoTitle } from "./component/Component";
 import { AutoCompleteInput, PlayGame } from "./component/GameComponent.tsx";
-import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import { Game } from "./Game.tsx";
 
 function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChangeGameState:(state:string)=> void }) {
-  const navigate = useNavigate();
   const location = useLocation();
   if (!location.state) {
     console.log("Aucun état trouvé");}

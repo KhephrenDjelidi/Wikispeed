@@ -1,8 +1,6 @@
 import {LogoTitle, SoloRanking} from './component/Component'
 import {CreditButton} from './component/Component'
 import {PlayShare} from './component/Component'
-
-import Damien from './assets/avatar/Avatar_damien.svg'
 import images from './assets/monster/images'
 
 

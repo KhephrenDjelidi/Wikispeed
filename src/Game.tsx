@@ -1,7 +1,7 @@
 import SoloCreation from "./SoloCreation";
 import SoloGame from "./SoloGame";
 import EndGameSolo from "./EndGameSolo";
-import {useState, useEffect, useMemo} from "react";
+import {useState, useEffect} from "react";
 import { Player } from "./types/Player";
 import { Loading } from "./component/GameComponent";
 
@@ -13,7 +13,7 @@ interface Setting {
     choixMots: string;
     wordsList: string[];
   }
- 
+
 export interface Game {
     players: Player[];
     currentPlayer: number;
@@ -25,7 +25,36 @@ export function useLocalStorage(key: string, initialValue: any) {
     const [storedValue, setStoredValue] = useState(() => {
         try {
             const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
+            if (item) {
+                const parsedItem = JSON.parse(item);
+
+                // Fonction pour parcourir un objet ou un tableau en profondeur et convertir les Maps sérialisées
+                const deepConvertMapsToObjects = (value: any): any => {
+                    if (value && value._isMap) {
+                        return new Map(value.entries); // Reconstruire la Map à partir des entrées
+                    }
+
+                    if (Array.isArray(value)) {
+                        return value.map(deepConvertMapsToObjects); // Parcours récursivement les tableaux
+                    }
+
+                    if (value !== null && typeof value === "object") {
+                        const newObj: any = {};
+                        for (const key in value) {
+                            if (value.hasOwnProperty(key)) {
+                                newObj[key] = deepConvertMapsToObjects(value[key]); // Parcours récursivement les objets
+                            }
+                        }
+                        return newObj;
+                    }
+
+                    return value; // Si c'est une valeur primitive, on la retourne telle quelle
+                };
+
+                const convertedItem = deepConvertMapsToObjects(parsedItem);
+                return convertedItem;
+            }
+            return initialValue;
         } catch (error) {
             console.error("Error reading localStorage key", key, error);
             return initialValue;
@@ -33,8 +62,36 @@ export function useLocalStorage(key: string, initialValue: any) {
     });
 
     useEffect(() => {
+
         try {
-            window.localStorage.setItem(key, JSON.stringify(storedValue));
+            const deepConvertMapsForSaving = (value: any): any => {
+                if (value instanceof Map) {
+                    return {
+                        _isMap: true,
+                        entries: Array.from(value.entries()),
+                    };
+                }
+
+                if (Array.isArray(value)) {
+                    return value.map(deepConvertMapsForSaving);
+                }
+
+                if (value !== null && typeof value === "object") {
+                    const newObj: any = {};
+                    for (const key in value) {
+                        if (value.hasOwnProperty(key)) {
+                            newObj[key] = deepConvertMapsForSaving(value[key]);
+                        }
+                    }
+                    return newObj;
+                }
+
+                return value; // Si c'est une valeur primitive, on la retourne telle quelle
+            };
+
+            const valueToStore = deepConvertMapsForSaving(storedValue);
+
+            window.localStorage.setItem(key, JSON.stringify(valueToStore));
         } catch (error) {
             console.error("Error saving to localStorage key", key, error);
         }
@@ -42,8 +99,6 @@ export function useLocalStorage(key: string, initialValue: any) {
 
     return [storedValue, setStoredValue];
 }
-
-
 
 export const Game = () => {
 
@@ -64,15 +119,6 @@ export const Game = () => {
         settings: setting,
         end: false,
     });
-    const updateHistory = (articleTitle: string) => {
-        setGame((prevGame: Game) => ({
-            ...prevGame,
-            players: prevGame.players.map((player, index) =>
-                index === 0 ? { ...player, history: [...player.history, articleTitle] } : player
-            ),
-        }));
-    };
-
 
     if(gameState === "build"){
         return(
@@ -85,25 +131,15 @@ export const Game = () => {
         )
     }
     else if (gameState === "game") {
-      if (game.players.length > 0 && game.players[0].articles.size === 0) {
-        const updatedGame = {
-          ...game,
-          players: [
-            {
-              ...game.players[0],
-              articles: new Map(game.settings.wordsList.map((article: string) => [article, false])),
-            },
-          ],
-        };
-        setGame(updatedGame);
-      }
-
+        // INITIALISE L'HISTORIQUE DANS LE PLAYER
         if (game.players[0].history.length === 0) {
             const randomTitle = game.settings.wordsList[Math.floor(Math.random() * game.settings.wordsList.length)];
 
+            // Met à jour l'historique et la Map des articles du joueur
             const updatedPlayer = {
                 ...game.players[0],
                 history: [randomTitle],
+                articles: new Map(game.players[0].articles).set(randomTitle, true), // Marque l'article comme "true"
             };
 
             const updatedGame = {
@@ -114,11 +150,21 @@ export const Game = () => {
             setGame(updatedGame);
         }
 
-
-    
-      return <><SoloGame game={game} onChange={setGame} onChangeGameState={setGameState} updateHistory={updateHistory}/>
-          <button onClick={()=>updateHistory('paris')}>test</button>
-
+// INITIALISE LA MAP DANS LE PLAYER
+        if (game.players.length > 0 && game.players[0].articles.size === 0) {
+            const updatedGame = {
+                ...game,
+                players: [
+                    {
+                        ...game.players[0],
+                        articles: new Map(game.settings.wordsList.map((article: string) => [article, false])),
+                    },
+                ],
+            };
+            setGame(updatedGame);
+        }
+        // AFFICHE LA PARTIE
+      return <><SoloGame game={game} onChange={setGame} onChangeGameState={setGameState}/>
       </>
     }
     else {

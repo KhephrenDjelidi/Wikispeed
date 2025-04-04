@@ -3,23 +3,21 @@ import { useSnailArtifact, SnailArtifactOverlay, SnailTimer } from './SnailArtif
 
 interface ArticleDisplayerProps {
   title: string;
-  setTitle: (newTitle: string) => void;
+  updateHistoryAndMap: (newTitle: string) => void;
 
-  updateArticleStatus: (title: string) => void;
   hasSnailArtifact?: boolean;
 }
 
 const MemoizedSnailTimer = memo(SnailTimer);
 const MemoizedSnailArtifactOverlay = memo(SnailArtifactOverlay);
 
-export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnailArtifact = false }: ArticleDisplayerProps) => {
+export const ArticleDisplayer = ({ title, updateHistoryAndMap, hasSnailArtifact = false }: ArticleDisplayerProps) => {
   const [content, setContent] = useState<string>('');
   const { isActive, activateSnail, remainingTime } = useSnailArtifact();
 
   const cleanArticle = useCallback((html: string) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-
     const sectionsToRemove = [
       "Notes_et_références",
       "Annexes",
@@ -75,17 +73,13 @@ export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnai
 
   useEffect(() => {
     let isMounted = true;
-    
     const fetchArticle = async () => {
       try {
         const response = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/html/${title}`);
         const data = await response.text();
         const cleanedContent = cleanArticle(data);
-        
         if (isMounted) {
           setContent(cleanedContent);
-          updateArticleStatus(title);
-          
           if (hasSnailArtifact) {
             activateSnail();
           }
@@ -94,13 +88,12 @@ export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnai
         console.error("Erreur lors de la récupération de l'article:", error);
       }
     };
-    
     fetchArticle();
-    
+
     return () => {
       isMounted = false;
     };
-  }, [title, updateArticleStatus, hasSnailArtifact, activateSnail, cleanArticle]);
+  }, [title, hasSnailArtifact, activateSnail, cleanArticle]);
 
   useEffect(() => {
     const articleTitle = document.getElementById("article_tit");
@@ -120,11 +113,11 @@ export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnai
           event.preventDefault();
           return;
         }
-        
+
         event.preventDefault();
         const newTitle = target.getAttribute("title");
         if (newTitle) {
-          setTitle(newTitle);
+          updateHistoryAndMap(newTitle);
         }
       }
     };
@@ -133,7 +126,7 @@ export const ArticleDisplayer = ({ title, setTitle, updateArticleStatus, hasSnai
     return () => {
       container.removeEventListener('click', handleClick);
     };
-  }, [content, isActive, setTitle]);
+  }, [content, isActive, updateHistoryAndMap, ]);
 
   useEffect(() => {
     const container = document.querySelector('.article-content');

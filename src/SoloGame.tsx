@@ -52,6 +52,13 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       ...props.game,
       players: [newPlayer],
     });
+
+    setPopupDisplay({
+      name: "Escargot",
+      image: snail,
+      message: "La malédiction de l'escargot vient de frapper ! Vous êtes aussi lent que lui et vous ne pouvez plus changer d'article pendant 1 minutes, prenez le temps réfléchir.",
+      onclose: undefined,
+    });
   }
   const resetSnail=()=>{
     const newPlayer: Player = {
@@ -83,12 +90,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   if (soloPlayer.articles && Array.from(soloPlayer.articles.values()).every(value => value === true)) {
     props.onChangeGameState("endgame");
   }
-
-  
-  const activateSnailArtifactRandomly = useCallback(() => {
-    const randomValue = Math.random();
-    return randomValue < 0.1;
-  }, []);
 
   // FONCTION ARTEFACTS  
 
@@ -247,7 +248,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
             <Inventory
               artifact1={{ name: 'Eraser', description: '', img: mine, onActivate: eraser }}
-              artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:backArtifact }}
+              artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:startSnail }}
               isExist={artefacts}
             />
 

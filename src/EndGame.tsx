@@ -38,11 +38,16 @@ function EndGame(){
 
         <CreditButton/>
     <LogoTitle/>
+
         <Podium ranking={listPlayer}></Podium> 
-        <RePlayButton player={player} players={players}/>
-    <BottomRedirection content="See the ranking" link="#bottom"/>
             </section>
+            <section id='bot'>
+            <BottomRedirection content="See the ranking" link="#bot"/>
+
          <Ranking ranking={listPlayer}/> 
+         <RePlayButton player={player} players={players}/>
+         </section>
+
         </main>
     </>
 }

@@ -157,14 +157,27 @@ props.player.articles = new Map<string, boolean>(props.player.articles);
         </>
     );
 }
-export const Ranking=(props :{ranking:Array<Player>})=>{
-    return <ul className="ranking manjari" id="bottom">{
-        props.ranking.map((r, i) => {
-            return <Rank key={i} player={r} position={i + 1}/>
-        })
-    }</ul>
-}
+export const Ranking = (props: { ranking: Array<Player> }) => {
+  // Clone et trie les joueurs sans modifier l’original
+  const sortedRanking = props.ranking.slice().sort((a, b) => {
+      const aFound = Array.from(a.articles.values()).filter(v => v).length;
+      const bFound = Array.from(b.articles.values()).filter(v => v).length;
 
+      if (bFound !== aFound) {
+          return bFound - aFound; // Plus d’articles trouvés en premier
+      }
+
+      return a.history.length - b.history.length; // Moins d’historique si égalité
+  });
+
+  return (
+      <ul className="ranking manjari" id="bottom">
+          {sortedRanking.map((r, i) => (
+              <Rank key={i} player={r} position={i + 1} />
+          ))}
+      </ul>
+  );
+};
 
 
 

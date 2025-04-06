@@ -247,7 +247,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
             <svg width="225" height="100" viewBox="0 0 225 73" fill="blue" xmlns="http://www.w3.org/2000/svg" id='bb'><path d="M111.675 -0.000378409C165.925 0.28796 237 19.4997 222 71.4994C206.999 123.499 165.925 114.16 111.674 113.872C57.4239 113.584 22.5001 123 2.99974 71.4993C-12 19 57.4247 -0.288717 111.675 -0.000378409Z" fill=" #4943C6" /></svg>
 
             <Inventory
-              artifact1={{ name: 'Eraser', description: '', img: mine, onActivate: eraser }}
+              artifact1={{ name: 'Disorienter', description: '', img: mine, onActivate: disorienter }}
               artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:startSnail }}
               isExist={artefacts}
             />

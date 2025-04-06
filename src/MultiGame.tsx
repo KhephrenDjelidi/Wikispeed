@@ -30,8 +30,9 @@ function MultiGame() {
     }
     
     // console.log("formData:", formData);
-    const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = formData;
 
+    const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = formData;
+    const duration = temps === -1 ? undefined : temps
     if(nombreArticles===0){
       console.log(formData);
       return <div>Loading.</div>;
@@ -60,7 +61,9 @@ function MultiGame() {
       avatar:avatar,
       score:20,
       history:[randomTitle],
-      articles:articlesMap.set(randomTitle, true) 
+      articles:articlesMap.set(randomTitle, true) ,
+      dictator: null,
+      snail: null,
     });
     const navigate = useNavigate();
 
@@ -124,6 +127,19 @@ function MultiGame() {
     }
     , [player]);
 
+    const resetSnail=()=>{
+      const newPlayer: Player = {
+        ...player,
+        snail :null
+      };
+
+    }
+
+    const timeUp = () => {
+      sharedChatManager.sendFinishGame();
+    }
+
+    const [startTime] = useState<number>(() => Date.now());
     useEffect(() => {
       if(isEnd){
 
@@ -165,10 +181,14 @@ function MultiGame() {
 
         <div className='game-container'>
           <div className='game-info'>
-              <Timer time={temps} onTimeUp={setIsOver} />
+          <Timer
+                deadlineMillis={duration !== undefined ? (startTime !== undefined ? startTime + duration * 60000 : undefined) : undefined}
+                onTimeUp={timeUp}
+            />
             </div>
           <div className='game-main'>
-          <ArticleDisplayer title={player.history.slice(-1)[0]} updateHistoryAndMap={updateHistoryAndMap} hasSnailArtifact={hasSnailArtifact} />
+
+          <ArticleDisplayer title={player.history.slice(-1)[0]} updateHistoryAndMap={updateHistoryAndMap} snail={player.snail} resetSnail={resetSnail}/>
                        
           <div className='game-main-details'>
               <ArticleList names={player.articles } />

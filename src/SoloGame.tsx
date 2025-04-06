@@ -17,6 +17,7 @@ import back from './assets/artifact/back.svg';
 import mine from './assets/artifact/mine.svg';
 import map from './assets/artifact/map.svg';
 import snail from './assets/artifact/escargot.svg';
+import { useEffect } from 'react';
 
 function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChangeGameState: (state: string) => void }) {
   const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = props.game.settings;
@@ -28,6 +29,10 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     const newArticles = new Map(soloPlayer.articles);
     const value = newArticles.get(articleTitle);
     props.game.players[props.game.currentPlayer].dictator = null;
+
+    if(!props.game.players[props.game.currentPlayer].history.includes(articleTitle)){
+      
+    }
 
     if (value !== undefined && !value) {
       newArticles.set(articleTitle, true);
@@ -91,6 +96,60 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   }
 
   // FONCTION ARTEFACTS  
+
+  async function generationArtefacts(title: string) {
+    const popularity = await fetchArticlePopularity(title);
+  
+    if (popularity == null) {
+      return;
+    } else {
+      const medianePopularity = popularity.firstArticlePopularity / 2;
+  
+      // Calcul du pourcentage basé sur la comparaison entre articlePopularity et medianePopularity
+      const calculatePercentage = (articlePopularity: number, medianePopularity: number) => {
+        const difference = articlePopularity - medianePopularity;
+  
+        if (difference > 0) {
+          // Si l'article est au-dessus de la médiane, calcule le pourcentage d'augmentation par rapport à la médiane
+          const percentage = (difference / medianePopularity) * 100;
+          // getrandomMalus();
+        } else {
+          // Si l'article est en-dessous ou égal à la médiane, on calcule le pourcentage basé sur la différence négative
+          const absoluteDifference = Math.abs(difference);  // Prendre la différence absolue
+          const percentage = (absoluteDifference / medianePopularity) * 100;
+          // getrandomBonus();
+      };
+  
+      // Calcul du pourcentage pour l'article en fonction de la médiane
+      const percentage = calculatePercentage(popularity.articlePopularity, medianePopularity);
+  
+      console.log(`Pourcentage de popularité de ${title} par rapport à la médiane : ${percentage}%`);
+    }
+  }
+}
+  
+  
+
+
+  const fetchArticlePopularity = async (title: string) => {
+    try {
+      const query = `http://localhost:3001/articles?title=${title}`;
+      console.log("query", query);
+      const response = await fetch(query);
+      const data = await response.json();
+      
+      console.log("data", data);
+      if (data && data.articlePopularity !== null) {
+        return data;
+      } else {
+        console.log('Article non trouvé ou sans popularité.');
+        return 0;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la popularité de l\'article :', error);
+      return null;
+    }
+  };
 
   interface popup {
     name: string;
@@ -339,7 +398,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
             <Inventory
               artifact1={{ name: 'Eraser', description: '', img: mine, onActivate: placemine }}
-              artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:startSnail }}
+              artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:backArtifact }}
               isExist={artefacts}
             />
 
@@ -360,6 +419,13 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         document.body
       )}
 
+      <button onClick={() => {
+        fetchArticlePopularity("Françoise_Fabian").then((pop) => {
+          console.log("Popularité de Françoise_Fabian :", pop.articlePopularity);
+        });
+      }}>
+        Test Popularité
+      </button>
     </>
   );
 }

@@ -315,6 +315,7 @@
     white-space: nowrap;
     scrollbar-width: none;        /* Firefox */
     overflow-x: auto;
+    min-width: 50vw;
 }
 .player-info ul li p,.player-info-modal ul li p{
     color: #FFD230;
@@ -378,6 +379,14 @@ sup{
 @media screen and (max-width: 550px){
     .infobox{
         display: none;
+    }
+    .chatbutton{
+      width: 8vw;
+      height: auto;
+      bottom: 1.5%;
+    }
+    .logo-solo{
+      display: none;
     }
 }
 
@@ -1011,6 +1020,7 @@ g{
   color: white;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   width: 11vw;
+  min-width: 200px;
   margin: 0 auto;
 }
 

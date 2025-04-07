@@ -516,14 +516,7 @@ function MultiGame() {
       </section>
 
             {/* Affichage des données récupérées */}
-      <div className="data-display">
-        <h2>Données récupérées :</h2>
-        <p><strong>Nombre d'articles :</strong> {nombreArticles}</p>
-        <p><strong>Artefacts :</strong> {artefacts}</p>
-        <p><strong>Temps :</strong> {temps}</p>
-        <p><strong>Mots aléatoires :</strong> {randomMots}</p>
-        <p><strong>Choix de mots :</strong> {wordsList.join(', ')}</p> {/* Affichage de la liste des mots */}
-      </div>
+
       <Background />
       {popupDisplay !== null && createPortal(
               <ArtifactPopup

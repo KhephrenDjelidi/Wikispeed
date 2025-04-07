@@ -20,6 +20,7 @@ export interface Room {
   id: string;
   players: Player[];
   members: Map<string, WebSocket>; // usernames linked to their websocket
+  mined :Map <number, string[][]>;
 }
 let rooms = new Map<string, Room>();
 
@@ -43,6 +44,7 @@ wss.on('connection', (ws: WebSocket) => {
             id: roomId,
             players: [],
             end: false,
+            mined: new Map(),
             members: new Map(),
           };
           rooms.set(roomId, room);
@@ -185,6 +187,7 @@ wss.on('connection', (ws: WebSocket) => {
               } else {
                 // Sinon on l’ajoute
                 currentRoom.players.push(player);
+                currentRoom.mined.set(player.id, []);
               }              currentRoom.members.forEach((memberWs, username) => {
                 console.log("player_at_the_end", data.players);
                 // Envoi des joueurs à tous les membres
@@ -196,6 +199,29 @@ wss.on('connection', (ws: WebSocket) => {
               });
             }
             break;
+
+          case 'mine':
+            if (currentRoom && currentUser) {
+              // Ajout du joueur à la liste des joueurs
+              const mine: string[][] = data.mined;
+              const mined = currentRoom.mined;
+                currentRoom.mined.set(data.id, mine);
+              currentRoom.members.forEach((memberWs, username) => {
+                console.log("mine", data.mined);
+                console.log("liste des mines", mined);
+                // Envoi des joueurs à tous les membres
+                memberWs.send(JSON.stringify({
+                  kind: 'mine',
+                  id: data.id,
+                  mined: Array.from(mined.entries()),
+                  sender: currentUser,
+                }));
+
+              }
+              );
+            }
+            break;
+
         case 'disconnect':
           if (currentRoom && currentUser) {
             currentRoom.members.delete(currentUser);

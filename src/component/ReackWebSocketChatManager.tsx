@@ -8,9 +8,11 @@ export class RealWebSocketChatManager implements RealChatManager {
   private playersListener: (players: string[]) => void = () => {};
   private isGameListener: (isGame: boolean) => void = () => {};
 
+
   private playersInformation: (players: Player[]) => void = () => {};
   private endListener: (isGame: boolean) => void = () => {};
   private parametersListener: (parameters:  Object) => void = () => {};
+  private mineListener: (mine: Map<number,string[][]>) => void = () => {};
   private roomID :string = '';
 
 
@@ -36,6 +38,10 @@ export class RealWebSocketChatManager implements RealChatManager {
       }else if(data.kind === "player-finished"){
        // console.log("player-finished", data.players);
         this.playersInformation(data.players);
+      }else if(data.kind === "mine"){
+         console.log("minedeeddeeded", data.mined);
+         console.log("mineaaaaaaaaaa", data.id);
+          this.mineListener(data.mined);
       }
         
         else if(data.kind === 'finish-game'){
@@ -146,6 +152,9 @@ export class RealWebSocketChatManager implements RealChatManager {
   setPlayersInfoListener(listener: (players: Player[]) => void): void {
     this.playersInformation = listener;
   }
+  setMineListener(listener: (mine: Map<number,string[][]>) => void): void {
+    this.mineListener = listener;
+  }
 
   sendMessage(content: string, photo: string): void {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -195,6 +204,19 @@ async sendPlayer(player: Player): Promise<void> {
       kind: "player_at_the_end",
       players: player,
       articles: Array.from(player.articles.entries()), // <-- ici
+    });
+    this.socket.send(message);
+  }
+}
+
+async sendMine(id:number,mine: string[][]): Promise<void> {
+  if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+//    console.log("sendPlayer", player);
+
+    const message = JSON.stringify({
+      kind: "mine",
+      id: id,
+      mined: mine, // <-- ici
     });
     this.socket.send(message);
   }

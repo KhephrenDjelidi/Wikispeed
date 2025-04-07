@@ -103,6 +103,10 @@ function MultiShare() {
 
   // Gestionnaire pour naviguer vers PageB avec les données
   const handlePlayGame = (event: React.FormEvent) => {
+    if (players.length < 2) {
+      alert("Vous devez être au moins 2 joueurs pour commencer le jeu.");
+      return;
+    }
     event.preventDefault();  // Empêcher la soumission du formulaire
     sharedChatManager.sendGameStart();
    

@@ -18,34 +18,85 @@ import mine from './assets/artifact/mine.svg';
 import snail from './assets/artifact/escargot.svg';
 
 function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChangeGameState: (state: string) => void }) {
+  const [popupDisplay, setPopupDisplay] = useState<popup|null>(null);
   const { nombreArticles, artefacts, temps, randomMots, choixMots, wordsList } = props.game.settings;
   const soloPlayer = props.game.players[0];
-  console.log("game", soloPlayer.articles);
-  const bonusArtifacts: Artifact[]= []/*
 
+  function addToInventory(Artifact: number) {
+    if(soloPlayer.inventory.length==2 || soloPlayer.inventory.includes(Artifact)){
+      return;
+    }
+    const newPlayer: Player = {
+      ...soloPlayer,
+      currentArtefact:0,
+      inventory:[...soloPlayer.inventory,Artifact],
+    };
+    props.onChange({
+      ...props.game,
+      players: [newPlayer],
+    });
 
+  }
+  const artefactList: Artifact[] = [    {
+    name: "Retour en arrière",
+    description: "string",
+    img: "string",
+    onActivate: backArtifact
+  },
+    {
+    name: "Mine",
+    description: "string",
+    img: "string",
+    onActivate: placemine
+  },
+    {
+      name: "Escargot",
+      description: "string",
+      img: "string",
+      onActivate:startSnail
+    },
+    {
+      name: "Dictateur",
+      description: "string",
+      img: "string",
+      onActivate: dictator
+    },
+    {
+      name: "Gomme",
+      description: "string",
+      img: "string",
+      onActivate: eraser
+    },
+    {
+      name: "Désorienteur",
+      description: "string",
+      img: "string",
+      onActivate: disorienter
+    }
+  ];
 
-
-
-
-
-  a remplir avec les BONUS ET MALUS
-
-
-
-
-  */
-  const malusArtifacts: Artifact[]= []
-
-
-  const updateHistoryAndMap = (articleTitle: string) => {
+  const currentArtefactIndex = soloPlayer.currentArtefact;
+  console.log(soloPlayer.currentArtefact);
+  if (currentArtefactIndex !== 0 && artefactList[currentArtefactIndex-1] !== undefined) {
+    const artefact = artefactList[currentArtefactIndex-1];
+    console.log("ARTEFACT",artefact);
+    if (currentArtefactIndex === 1 || currentArtefactIndex === 2) {
+      addToInventory(currentArtefactIndex);
+    }
+    else if (artefact.onActivate !== undefined) {
+      console.log(artefact.onActivate);
+      artefact.onActivate();
+    }
+  }
+  const updateHistoryAndMap = async (articleTitle: string) => {
     const newHistory = soloPlayer.history ? [...soloPlayer.history, articleTitle] : [articleTitle];
     const newArticles = new Map(soloPlayer.articles);
     const value = newArticles.get(articleTitle);
     props.game.players[props.game.currentPlayer].dictator = null;
-
+    let x=0;
     if(!props.game.players[props.game.currentPlayer].history.includes(articleTitle)){
-
+      x = await generationArtefacts(articleTitle.replace(/ /g, "_"));
+      console.log(x);
     }
 
     if (value !== undefined && !value) {
@@ -55,28 +106,30 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       ...soloPlayer,
       history: newHistory,
       articles: newArticles,
+      currentArtefact:x
     };
     props.onChange({
       ...props.game,
       players: [newPlayer],
     });
   };
-  const startSnail=()=>{
+  function startSnail(){
     const newPlayer: Player = {
       ...soloPlayer,
-      snail :Date.now()
+      snail :Date.now(),
+      currentArtefact:0
     };
     props.onChange({
       ...props.game,
       players: [newPlayer],
     });
 
-    setPopupDisplay({
+    /*setPopupDisplay({
       name: "Escargot",
       image: snail,
       message: "La malédiction de l'escargot vient de frapper ! Vous êtes aussi lent que lui et vous ne pouvez plus changer d'article pendant 1 minutes, prenez le temps de réfléchir.",
       onclose: undefined,
-    });
+    });*/
   }
   const resetSnail=()=>{
     const newPlayer: Player = {
@@ -109,17 +162,18 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     props.onChangeGameState("endgame");
   }
 
-  // FONCTION ARTEFACTS  
+  // FONCTION ARTEFACTS
   function randomMalus(probability:number) {
     const rand = Math.random();
-
     if (rand < 1 - probability) {
-      return -1;
+      return 0;
     }
 
-    const min = 0;
-    const max = malusArtifacts.length-1;
+    const min = 3;
+    const max = artefactList.length-1;
+    console.log(min,max)
     const range = max - min + 1;
+    console.log("Artéfact obtenu ",Math.floor(Math.random() * range) + min);
     return Math.floor(Math.random() * range) + min;
   }
 
@@ -127,17 +181,16 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     const rand = Math.random();
 
     if (rand < 1 - probability) {
-      return -1;
+      return 0;
     }
-    const min = 0;
-    const max = bonusArtifacts.length-1;
+    const min = 1;
+    const max = 2;
     const range = max - min + 1;
     return Math.floor(Math.random() * range) + min;
   }
 
   async function generationArtefacts(title: string) {
     const popularity = await fetchArticlePopularity(title);
-
     if (popularity == null) {
       return 0;
     }
@@ -145,7 +198,9 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       const medianePopularity = popularity.firstArticlePopularity / 2;
       const difference = popularity.articlePopularity - medianePopularity;
       const absoluteDifference = Math.abs(difference);
-      const probability = (absoluteDifference / medianePopularity);
+      const probability = (absoluteDifference / medianePopularity)/8 ;
+      console.log(difference > 0?"malus":"bonus")
+      console.log("probability",probability)
       if (difference > 0) {
         return randomMalus(probability);
       } else {
@@ -160,19 +215,15 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   const fetchArticlePopularity = async (title: string) => {
     try {
       const query = `http://localhost:3001/articles?title=${title}`;
-      console.log("query", query);
       const response = await fetch(query);
       const data = await response.json();
 
-      console.log("data", data);
       if (data && data.articlePopularity !== null) {
         return data;
       } else {
-        console.log('Article non trouvé ou sans popularité.');
         return 0;
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la popularité de l\'article :', error);
       return null;
     }
   };
@@ -184,31 +235,47 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     onclose: undefined;
   }
 
-  const [popupDisplay, setPopupDisplay] = useState<popup|null>(null);
 
-  console.log("historique", soloPlayer.history);
 
   function backArtifact() {
-
+/*
     setPopupDisplay({
       name: "Retour",
       image: back,
       message: "Vous venez d'activer le retour en arrière, vous venez de remonter dans le temps",
       onclose: undefined,
+    });*/
+    const newInventory = soloPlayer.inventory.filter(item => item !== 1);
+
+    const articleTitle=props.game.players[props.game.currentPlayer].history.slice(-2)[0]
+    const newHistory = soloPlayer.history ? [...soloPlayer.history, articleTitle] : [articleTitle];
+    const newArticles = new Map(soloPlayer.articles);
+    const value = newArticles.get(articleTitle);
+    props.game.players[props.game.currentPlayer].dictator = null;
+
+    if (value !== undefined && !value) {
+      newArticles.set(articleTitle, true);
+    }
+    const newPlayer: Player = {
+      ...soloPlayer,
+      history: newHistory,
+      articles: newArticles,
+      inventory: newInventory
+    };
+    props.onChange({
+      ...props.game,
+      players: [newPlayer],
     });
 
-    if (1 === 1) {
-      updateHistoryAndMap(props.game.players[props.game.currentPlayer].history.slice(-2)[0]);
-    }
   }
 
   function eraser() {
-    setPopupDisplay({
+    /*setPopupDisplay({
       name: "Gomme",
       image: gomme,
       message: "Pas de chance, la Gomme viens d'être activté, vous avez perdu votre dernier article trouvé !",
       onclose: undefined
-    });
+    });*/
 
     if (1 == 1) {
       for (let i = props.game.players[props.game.currentPlayer].history.length - 1; i >= 0; i--) {
@@ -224,6 +291,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
               {
                 ...props.game.players[props.game.currentPlayer],
                 articles: updatedArticles,
+                currentArtefact:0
               },
             ],
           });
@@ -234,23 +302,50 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   }
 
   async function disorienter() {
+    /*
     setPopupDisplay({
       name: "Désorienter",
       image: desorienter,
       message: "Le Désorienter vient de s'activer, vous allez être amené vers un article aléatoire, bonne chance !",
       onclose: undefined,
-    });
+    });*/
 
     if (1 == 1) {
       const response = await fetch("https://fr.wikipedia.org/api/rest_v1/page/random/summary");
       const data = await response.json();
-      updateHistoryAndMap(data.title);
+      const articleTitle=data.title;
+
+      const newHistory = soloPlayer.history ? [...soloPlayer.history, articleTitle] : [articleTitle];
+      const newArticles = new Map(soloPlayer.articles);
+      const value = newArticles.get(articleTitle);
+      props.game.players[props.game.currentPlayer].dictator = null;
+      console.log(newHistory);
+      if (value !== undefined && !value) {
+        newArticles.set(articleTitle, true);
+      }
+      const newPlayer: Player = {
+        ...soloPlayer,
+        history: newHistory,
+        articles: newArticles,
+        currentArtefact:0
+      };
+      props.onChange({
+        ...props.game,
+        players: [newPlayer],
+      });
     }
   }
 
   function dictator() {
     const articlesMap = new Map(props.game.players[props.game.currentPlayer].articles);
 
+    /*
+       setPopupDisplay({
+      name: "Dictateur",
+      image: dictateur,
+      message: "Le Dictateur a parlé, vous devez vous rendre sur l'article : " + props.game.players[props.game.currentPlayer].dictator + ", votre liste d'articles ne sera plus mise à jour tant que le dictateur ne sera pas satisfait !",
+      onclose: undefined,
+    });*/
     if (1 == 1) {
       if (!props.game.players[props.game.currentPlayer].dictator) {
         const availableTitles = props.game.settings.wordsList.filter(
@@ -260,11 +355,11 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         if (availableTitles.length > 0) {
           const randomTitle = availableTitles[Math.floor(Math.random() * availableTitles.length)];
           props.game.players[props.game.currentPlayer].dictator = randomTitle;
-          console.log("dictator", props.game.players[props.game.currentPlayer].dictator);
 
           const newPlayer = {
             ...props.game.players[props.game.currentPlayer],
             dictator: randomTitle,
+            currentArtefact:0
           };
 
           props.onChange({
@@ -274,12 +369,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         }
       }
     }
-    setPopupDisplay({
-      name: "Dictateur",
-      image: dictateur,
-      message: "Le Dictateur a parlé, vous devez vous rendre sur l'article : " + props.game.players[props.game.currentPlayer].dictator + ", votre liste d'articles ne sera plus mise à jour tant que le dictateur ne sera pas satisfait !",
-      onclose: undefined,
-    });
+
   }
 
   function dictatorUpdate(currentTitle: string) {
@@ -341,12 +431,16 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     try {
       const articleLinks = await extractArticleLinks(lastHistory);
 
-      console.log("articleLinks", articleLinks);
 
       newMined.set(props.game.currentPlayer, [...currentList, [lastHistory, ...articleLinks]]);
-
+      const newInventory = soloPlayer.inventory.filter(item => item !== 2);
+      const newPlayer = {
+        ...props.game.players[props.game.currentPlayer],
+        inventory: newInventory,
+      };
       props.onChange({
         ...props.game,
+        players:[newPlayer],
         mined: newMined,
       });
     } catch (error) {
@@ -375,7 +469,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       });
     }
 
-    setPopupDisplay({
+    /*setPopupDisplay({
       name: "Mine",
       image: mine,
       message: "Igo, le terrain est miné, pour de vrai, pour de vrai, le terrain est miné\n" +
@@ -384,9 +478,8 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
           "Ça sentait toujours la caille, les taudis, les RS, les RS, les Cayenne\n" +
           "Les petits, ils oublient d'respecter les doyens, les doyens, ils oublient d'respecter les petits",
       onclose: undefined,
-    });
+    });*/
   }
-  console.log("dictator", props.game.players[props.game.currentPlayer].dictator);
   return (
       <>
         <section className='main-page game'>
@@ -423,8 +516,8 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
               <svg width="225" height="100" viewBox="0 0 225 73" fill="blue" xmlns="http://www.w3.org/2000/svg" id='bb'><path d="M111.675 -0.000378409C165.925 0.28796 237 19.4997 222 71.4994C206.999 123.499 165.925 114.16 111.674 113.872C57.4239 113.584 22.5001 123 2.99974 71.4993C-12 19 57.4247 -0.288717 111.675 -0.000378409Z" fill=" #4943C6" /></svg>
 
               <Inventory
-                  artifact1={{ name: 'Eraser', description: '', img: mine, onActivate: placemine }}
-                  artifact2={{ name: 'Retour en arrière', description: '', img: back, onActivate:backArtifact }}
+                  artifact1={artefactList[soloPlayer.inventory[0] - 1] || null}
+                  artifact2={artefactList[soloPlayer.inventory[1] - 1] || null}
                   isExist={artefacts}
               />
 
@@ -452,9 +545,29 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         }}>
           Test Popularité
         </button>
+
+        <button onClick={() => { const newPlayer = {
+          ...props.game.players[props.game.currentPlayer],
+          dictator:null,
+          currentArtefact:0,
+          inventory:[],
+          snail:null
+        };
+
+          props.onChange({
+            ...props.game,
+            players: [newPlayer],
+          });
+        }}>
+
+          RESET
+        </button>
+
       </>
   );
 }
 
 
+
 export default SoloGame;
+

@@ -115,7 +115,7 @@ export const ArticleDisplayer = ({ title, updateHistoryAndMap,snail,resetSnail,m
           let triggered = false;
 
           for (const [key, lists] of mined.entries()) {
-            // if (key === currentPlayer) continue;
+            if (key === currentPlayer) continue;
             for (let i = 0; i < lists.length; i++) {
               const list = lists[i];
               if (list.includes(newTitle)) {
@@ -144,7 +144,7 @@ export const ArticleDisplayer = ({ title, updateHistoryAndMap,snail,resetSnail,m
     return () => {
       container.removeEventListener('click', handleClick);
     };
-  }, [snail,content, updateHistoryAndMap,triggerMined,mined]);
+  }, [snail,content, updateHistoryAndMap,triggerMined,mined,currentPlayer]);
   useEffect(() => {
     const container = document.querySelector('.article-content');
     if (!container) return;

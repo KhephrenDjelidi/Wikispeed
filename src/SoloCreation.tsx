@@ -9,7 +9,6 @@ import { LogoTitle } from "./component/Component";
 import { AutoCompleteInput, PlayGame } from "./component/GameComponent.tsx";
 import { useLocation } from 'react-router-dom';
 import { Game } from "./Game.tsx";
-import { start } from "repl";
 
 function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChangeGameState:(state:string)=> void }) {
   const location = useLocation();
@@ -20,7 +19,7 @@ function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChan
   console.log("Nom d'utilisateur:", username);
   console.log("Avatar:", avatar);
 
-  const player = {id: 1, name: username, avatar: avatar, history: [], time: 0, score: 0, articles:new Map(),dictator:null,snail:null };
+  const player = {id: 1, name: username, avatar: avatar, history: [], time: 0, score: 0, articles:new Map(),dictator:null,snail:null, inventory:[], currentArtefact:0};
 
 
   const [nombreArticles, setNombreArticles] = useState<number>(0);

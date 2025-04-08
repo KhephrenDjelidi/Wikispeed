@@ -8,4 +8,6 @@ export interface Player {
     articles: Map<string, boolean>;
     dictator: string | null;
     snail: number | null;
+    inventory: number[];
+    currentArtefact: number;
 }

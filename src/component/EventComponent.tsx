@@ -66,7 +66,7 @@ export const ArticleList = (props: { names: Map<string,boolean>, dictatorWord : 
                     </li>
                 ))}
             </ul>
-        </div>      
+        </div>
     );
 };
 
@@ -93,7 +93,7 @@ export const PlayerInfo = (props: { players: Player[], articles: Map<string,bool
                     <h2>Joueurs</h2>
                     <ul>
                         {props.players.map((player, i) => (
-                            
+
                             <li key={i}>
                                 <p className="manjari">{player.name}</p>
                                 <p className="manjari player-score">{Array.from(arrayToMap(player).values()).filter(value => value).length} / {props.articles.size} {player.history.slice(-1)[0]}</p>
@@ -112,8 +112,8 @@ export const PlayerInfo = (props: { players: Player[], articles: Map<string,bool
                                     {props.players.map((player, i) => (
                                         <li key={i}>
                                             <p className="manjari">{player.name}</p>
-                                            <p className="manjari player-score">{Array.from(arrayToMap(player).values()).filter(value => value).length} / {props.articles.size} {player.history.slice(-1)[0]}</p>
-                                            </li>
+                                            <p className="manjari player-score">{player.score}/{props.articles.size}</p>
+                                        </li>
                                     ))}
                                 </ul>
                             </div>,
@@ -137,10 +137,18 @@ export const PlayerInfo = (props: { players: Player[], articles: Map<string,bool
     );
 };
 
-export const Inventory = (props:{artifact1 :Artifact, artifact2 : Artifact ; isExist : boolean }) =>{
-    const artifacts = [props.artifact1,props.artifact2]
-    return    props.isExist== true  && <div className='inventory'>
-                <ArtifactsList artifacts={artifacts} ></ArtifactsList>
-                </div>            
+export const Inventory = (props: { artifact1: Artifact; artifact2: Artifact; isExist: boolean }) => {
+    const artifacts = [props.artifact1, props.artifact2].filter((artifact) => artifact !== null);
 
-}
+    return (
+        props.isExist && (
+            <div className='inventory'>
+                {artifacts.length > 0 ? (
+                    <ArtifactsList artifacts={artifacts} />
+                ) : (
+                    <p>Inventaire vide</p>
+                )}
+            </div>
+        )
+    );
+};

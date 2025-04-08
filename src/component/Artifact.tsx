@@ -20,7 +20,7 @@ export const ArtifactPopup = ({ artifactName, artifactImage, message, onClose }:
         <div className="artifact-popup-overlay" onClick={onClose}>
             <div className="artifact-popup-message" onClick={(e) => e.stopPropagation()}>
                 <img src={artifactImage} alt={artifactName} className="artifact-popup-icon" />
-                <h2 className="manjari">{artifactName} a été activé !</h2>
+                <h2 className="manjari">{artifactName}</h2>
                 <p className="manjari">{message}</p>
             </div>
             <div className="artifact-popup-backdrop" />

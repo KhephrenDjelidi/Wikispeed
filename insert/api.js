@@ -2,6 +2,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';  // Ajoute l'import du package cors
 import Article from './Articles.js';
+import { exec } from "child_process";
+
+
+
 
 const app = express();
 
@@ -57,8 +61,44 @@ app.get("/articles", async (req, res) => {
   }
 });
 
+
+app.get("/solve", (req, res) => {
+  const { start_id, target_id } = req.query;
+
+  // Vérifie si start_id et target_id sont fournis
+  if (!start_id || !target_id) {
+      return res.status(400).send("start_id and target_id are required.");
+  }
+
+  // Échapper les parenthèses et autres caractères spéciaux en les mettant entre guillemets
+  const escapedStartId = `"${start_id}"`; // Utilise des guillemets autour de start_id
+  const escapedTargetId = `"${target_id}"`; // Utilise des guillemets autour de target_id
+
+  // Exécuter le script Python en passant les paramètres start_id et target_id
+  exec(`python3 solver.py ${escapedStartId} ${escapedTargetId}`, (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return res.status(500).send(`Error: ${error.message}`);
+      }
+      if (stderr) {
+          console.error(`stderr: ${stderr}`);
+          return res.status(500).send(`stderr: ${stderr}`);
+      }
+
+      // Traite la sortie du script Python
+      const output = stdout.split("\n");
+      const distance = output[0].replace("Distance:", "").trim();
+      const path = output[1].replace("Path:", "").trim();
+
+      // Renvoie la réponse JSON avec la distance et le chemin
+      res.json({ distance, path });
+  });
+});
+
+
 // Lancer le serveur
 const port = 3001;
 app.listen(port, () => {
   console.log(`🚀 API Popularité en ligne sur http://localhost:${port}`);
 });
+

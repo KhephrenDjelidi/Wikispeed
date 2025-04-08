@@ -307,6 +307,10 @@
            
         }
     }
+    .player-info ul li,.player-info-modal  ul li{
+
+      min-width: 50vw;
+  }
 }
 
 .player-info ul li,.player-info-modal  ul li{
@@ -315,7 +319,7 @@
     white-space: nowrap;
     scrollbar-width: none;        /* Firefox */
     overflow-x: auto;
-    min-width: 50vw;
+    min-width: 10vw;
 }
 .player-info ul li p,.player-info-modal ul li p{
     color: #FFD230;

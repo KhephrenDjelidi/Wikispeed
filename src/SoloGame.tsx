@@ -170,9 +170,12 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     }
 
     const min = 3;
+    console.log(",,,,,,",artefactList.length)
+    console.log(",,,,,,",artefactList)
     const max = artefactList.length-1;
     console.log(min,max)
     const range = max - min + 1;
+    console.log("range",range)
     console.log("Artéfact obtenu ",Math.floor(Math.random() * range) + min);
     return Math.floor(Math.random() * range) + min;
   }
@@ -195,10 +198,16 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       return 0;
     }
     else {
-      const medianePopularity = popularity.firstArticlePopularity / 2;
+
+      const medianePopularity = popularity.firstArticlePopularity / 800;
+      console.log("firstArticlePopularity",popularity.firstArticlePopularity)
+      console.log("medianePopularity",medianePopularity)
+      console.log("articlePopularity",popularity.articlePopularity)
       const difference = popularity.articlePopularity - medianePopularity;
       const absoluteDifference = Math.abs(difference);
-      const probability = (absoluteDifference / medianePopularity)/8 ;
+      console.log("difference",difference)
+      const probability = (absoluteDifference / medianePopularity)/4 ;
+      console.log("probabilité",absoluteDifference ,"/",medianePopularity)
       console.log(difference > 0?"malus":"bonus")
       console.log("probability",probability)
       if (difference > 0) {

@@ -77,7 +77,9 @@ function MultiGame() {
       articles:articlesMap.set(randomTitle, true) ,
       dictator: null,
       snail: null,
-    });
+      inventory: [],
+      currentArtefact: 0
+        });
     const navigate = useNavigate();
 
     const getPlayerIdByName = (playersMap: Map<number, string>, name: string): number  => {

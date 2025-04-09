@@ -62,37 +62,49 @@ app.get("/articles", async (req, res) => {
 });
 
 
+// Assure-toi que la sortie soit bien encodée en JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/solve", (req, res) => {
   const { start_id, target_id } = req.query;
 
-  // Vérifie si start_id et target_id sont fournis
   if (!start_id || !target_id) {
-      return res.status(400).send("start_id and target_id are required.");
+    return res.status(400).send("start_id and target_id are required.");
   }
 
-  // Échapper les parenthèses et autres caractères spéciaux en les mettant entre guillemets
-  const escapedStartId = `"${start_id}"`; // Utilise des guillemets autour de start_id
-  const escapedTargetId = `"${target_id}"`; // Utilise des guillemets autour de target_id
+  const escapedStartId = `"${start_id}"`;
+  const escapedTargetId = `"${target_id}"`;
 
-  // Exécuter le script Python en passant les paramètres start_id et target_id
-  exec(`python3 solver.py ${escapedStartId} ${escapedTargetId}`, (error, stdout, stderr) => {
+  // Lancer le script Python et récupérer la sortie JSON
+  exec(
+    `python3 solver.py ${escapedStartId} ${escapedTargetId}`,
+    { encoding: "utf8" }, // Assurer l'UTF-8 pour stdout
+    (error, stdout, stderr) => {
       if (error) {
-          console.error(`exec error: ${error}`);
-          return res.status(500).send(`Error: ${error.message}`);
+        console.error(`exec error: ${error}`);
+        return res.status(500).send(`Error: ${error.message}`);
       }
       if (stderr) {
-          console.error(`stderr: ${stderr}`);
-          return res.status(500).send(`stderr: ${stderr}`);
+        console.error(`stderr: ${stderr}`);
+        return res.status(500).send(`stderr: ${stderr}`);
       }
 
-      // Traite la sortie du script Python
-      const output = stdout.split("\n");
-      const distance = output[0].replace("Distance:", "").trim();
-      const path = output[1].replace("Path:", "").trim();
+      try {
+        // Parse directement le JSON renvoyé par le script Python
+        const data = JSON.parse(stdout);
 
-      // Renvoie la réponse JSON avec la distance et le chemin
-      res.json({ distance, path });
-  });
+        // Assurer que le contenu soit bien UTF-8
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+
+        // Renvoie la réponse en JSON
+        res.json(data);
+      } catch (parseError) {
+        console.error("Erreur de parsing du JSON du Python:", parseError);
+        return res.status(500).send("Invalid JSON format from Python script.");
+      }
+    }
+  );
 });
 
 

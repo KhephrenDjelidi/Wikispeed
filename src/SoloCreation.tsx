@@ -9,6 +9,8 @@ import { LogoTitle } from "./component/Component";
 import { AutoCompleteInput, PlayGame } from "./component/GameComponent.tsx";
 import { useLocation } from 'react-router-dom';
 import { Game } from "./Game.tsx";
+import { MusicPlayer } from './component/MusicComponent'
+
 
 function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChangeGameState:(state:string)=> void }) {
   const location = useLocation();
@@ -101,6 +103,7 @@ function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChan
         <LogoTitle />
         <Background />
         <CreditButton />
+        <MusicPlayer/>
 
         <div className="big">
           <form onSubmit={handlePlayGame}> {/* Utiliser onSubmit pour gérer la soumission */}

@@ -16,6 +16,9 @@ import dictateur from './assets/artifact/dictateur.svg';
 import back from './assets/artifact/back.svg';
 import mine from './assets/artifact/mine.svg';
 import snail from './assets/artifact/escargot.svg';
+import teleporteur from './assets/artifact/teleporteur.svg';
+import { MusicPlayer } from './component/MusicComponent'
+
 
 function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChangeGameState: (state: string) => void }) {
   const [popupDisplay, setPopupDisplay] = useState<popup|null>(null);
@@ -56,6 +59,12 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     img: mine,
     onActivate: placemine
   },
+  {
+    name: "Téléporteur",
+    description: "Vous téléporte sur un article à 2 liens d'un article a trouver",
+    img: teleporteur,
+    onActivate: teleporter
+  },
     {
       name: "Escargot",
       description: "La malédiction de l'escargot a frappé ! Vous ne pouvez plus changer de page pendant 1 minute.",
@@ -93,6 +102,12 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       image: mine,
       message: "Une mine a été ajouté a votre inventaire, posez la pour miner le terrain de vos adversaires",
       onclose: undefined,
+    },   
+    {
+      name: "Téléporteur a été ajouté a votre inventaire",
+      image: teleporteur,
+      message: "Une téléporteur a été ajouté a votre inventaire, utilisez le pour vous téléporter a 2 liens d'un article cible",
+      onclose: undefined,
     },
     {
       name: "Escargot a été activé !",
@@ -128,7 +143,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       console.log("ARTEFACT", artefact);
 
       if (popupDisplay === null) {
-        if (currentArtefactIndex === 1 || currentArtefactIndex === 2 ) {
+        if (currentArtefactIndex === 1 || currentArtefactIndex === 2 || currentArtefactIndex === 3 ) {
           if(!soloPlayer.inventory.includes(currentArtefactIndex)){
             setPopupDisplay(popupList[currentArtefactIndex - 1]);
             addToInventory(currentArtefactIndex);
@@ -228,7 +243,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       return 0;
     }
 
-    const min = 3;
+    const min = 4;
     console.log(",,,,,,",artefactList.length)
     console.log(",,,,,,",artefactList)
     const max = artefactList.length;
@@ -246,7 +261,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       return 0;
     }
     const min = 1;
-    const max = 2;
+    const max = 3;
     const range = max - min + 1;
     return Math.floor(Math.random() * range) + min;
   }
@@ -415,6 +430,14 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
   }
 
+  function dictatorUpdate(currentTitle: string) {
+    if (currentTitle == props.game.players[props.game.currentPlayer].dictator) {
+      updateHistoryAndMap(currentTitle);
+    } else {
+      updateHistory(currentTitle);
+    }
+  }
+  
   async function teleporter() {
     const player = props.game.players[props.game.currentPlayer];
     const availableTitles = props.game.settings.wordsList.filter(
@@ -428,13 +451,32 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       const currentArticle = player.history[player.history.length - 1];
 
       try {
+        console.log("Response:", `http://localhost:3001/solve?start_id=${encodeURIComponent(currentArticle)}&target_id=${encodeURIComponent(randomTarget)}`);
         const response = await fetch(`http://localhost:3001/solve?start_id=${encodeURIComponent(currentArticle)}&target_id=${encodeURIComponent(randomTarget)}`);
         const data = await response.json();
         console.log("dara",data)
-        const parsedPath = JSON.parse(data.path);
-        console.log("Parsed Path:", parsedPath);
+
+        const pathAsList = (data.path);
+        console.log("Parsed Path:", pathAsList);
         if (data && data.path && data.path.length >= 2) {
-          const teleportArticle = data.path[1];
+          const lenghth = data.path.length;
+          if(lenghth < 4) {
+            setPopupDisplay({
+              name: "Téléporteur",
+              image: teleporteur, 
+              message: `Vous n'avez été téléporté vers l'article car vous en êtes trop proche`,
+              onclose: undefined,
+            });
+
+            return;
+          }
+          setPopupDisplay({
+            name: "Téléporteur",
+            image: teleporteur,
+            message: "Vous venez d'activer le téléporteur, vous allez être téléporté à 2 liens de l'article : ",
+            onclose: undefined,
+          })
+          const teleportArticle = data.path[lenghth - 3];
 
           const newHistory = player.history ? [...player.history, teleportArticle] : [teleportArticle];
           const newArticles = new Map(player.articles);
@@ -444,7 +486,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
             newArticles.set(teleportArticle, true);
           }
 
-          const newInventory = soloPlayer.inventory.filter(item => item !== 6); // Assuming 6 is the ID for the teleporter artifact
+          const newInventory = soloPlayer.inventory.filter(item => item !== 3);
 
           const newPlayer: Player = {
             ...player,
@@ -472,13 +514,26 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     }
   }
 
-  function dictatorUpdate(currentTitle: string) {
-    if (currentTitle == props.game.players[props.game.currentPlayer].dictator) {
-      updateHistoryAndMap(currentTitle);
-    } else {
-      updateHistory(currentTitle);
-    }
-  }
+//   async function gps() {
+//     const player = props.game.players[props.game.currentPlayer];
+//     const availableTitles = props.game.settings.wordsList.filter(
+//       (title) => !player.articles.get(title)
+//     );
+
+//     if (availableTitles.length > 0) {
+     
+//       for(let i = 0; i < availableTitles.length; i++) {
+//         const articleTitle = availableTitles[i];
+//         const currentArticle = player.history[player.history.length - 1];
+//         console.log("Response:", `http://localhost:3001/solve?start_id=${encodeURIComponent(currentArticle)}&target_id=${encodeURIComponent(articleTitle)}`);
+//         const response = await fetch(`http://localhost:3001/solve?start_id=${encodeURIComponent(currentArticle)}&target_id=${encodeURIComponent(articleTitle)}`);
+//         const data = await response.json();
+//         console.log("dara",data)
+//         const pathAsList = (data.path);
+//         console.log("Parsed Path:", pathAsList);
+//       }
+//   }
+// }
   const extractArticleLinks = async (title: string): Promise<string[]> => {
     try {
       const response = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/html/${title}`);
@@ -631,6 +686,9 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
           </div>
         </section>
         <Background />
+        <MusicPlayer/>
+
+        <button onClick={teleporter}>TP</button>
 
         {popupDisplay !== null && createPortal(
             <ArtifactPopup
@@ -671,7 +729,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         <button onClick={() => { const newPlayer = {
           ...props.game.players[props.game.currentPlayer],
           dictator:null,
-          currentArtefact:1,
+          currentArtefact:3,
           snail:null
         };
           props.onChange({

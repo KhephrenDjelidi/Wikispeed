@@ -520,6 +520,7 @@ function MultiGame() {
             {/* Affichage des données récupérées */}
 
       <Background />
+      <MusicPlayer/>
       {popupDisplay !== null && createPortal(
               <ArtifactPopup
                 artifactName={popupDisplay.name}

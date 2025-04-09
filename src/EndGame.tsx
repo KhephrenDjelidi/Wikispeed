@@ -1,7 +1,7 @@
 import {LogoTitle, PlayShare, Podium, Ranking, RePlayButton} from './component/Component'
 import {CreditButton} from './component/Component'
 import {BottomRedirection} from './component/Component'
-
+import { MusicPlayer } from './component/MusicComponent'
 import Damien from './assets/avatar/Avatar_damien.svg'
 import images from './assets/monster/images'
 
@@ -38,6 +38,8 @@ function EndGame(){
 
         <CreditButton/>
     <LogoTitle/>
+    <MusicPlayer/>
+
 
         <Podium ranking={listPlayer}></Podium> 
             </section>

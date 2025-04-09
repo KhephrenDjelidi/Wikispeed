@@ -19,6 +19,7 @@
     "fs": "^0.0.1-security",
     "heap": "^0.2.7",
     "mongoose": "^8.13.2",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

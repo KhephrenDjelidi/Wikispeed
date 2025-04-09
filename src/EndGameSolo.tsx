@@ -6,8 +6,42 @@ import images from './assets/monster/images'
 import './style/wikispeed.css'
 import { Background } from './assets/back'
 import { Game } from './Game'
+import { useEffect } from 'react'
 
-function EndGameSolo(props:{game:Game; onChangeGameState:(state:string)=> void}){
+function EndGameSolo(props:{game:Game; onChangeGameState:(state:string)=> void ,challenge:String}){
+  if (props.challenge == "Challenge"){
+
+
+
+    useEffect(() => {
+  
+            // Envoi du score dès que la partie est terminée
+          addScore()
+  
+    }, [props.game]);
+    }
+  
+    const addScore = async () => {
+      const response = await fetch("http://localhost:3000/add-score", {
+        method: "POST", // Utilise POST ici
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: props.game.players[0].name, // Remplace par des données réelles
+          start_article: props.game.settings.wordsList[0],
+          destination_article: props.game.settings.wordsList[1],
+          path: props.game.players[0].history.join("->"),
+          steps: props.game.players[0].history.length-1
+  
+        })
+      });
+  
+      const data = await response.json();
+      console.log(data);
+  
+    };
+    
     return <>
         <Background></Background>
         <main>

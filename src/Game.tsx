@@ -4,6 +4,9 @@ import EndGameSolo from "./EndGameSolo";
 import {useState, useEffect} from "react";
 import { Player } from "./types/Player";
 import { Loading } from "./component/GameComponent";
+import { useLocation } from "react-router-dom";
+import { Inventory } from "./component/EventComponent";
+import { channel } from "diagnostics_channel";
 
 interface Setting {
     nombreArticles: number;
@@ -104,55 +107,104 @@ export function useLocalStorage(key: string, initialValue: any) {
 }
 
 export const Game = () => {
+    const location = useLocation();
+    let challenge = location.state?.gameState || "";
+    const username = location.state?.username || ""; 
+    const avatar = location.state?.avatar  || "";
 
 
     const [gameState, setGameState] = useLocalStorage("gameState", "build");
-    const setting = {
-        nombreArticles: 0,
+
+    useEffect(()=>{
+     if (challenge == "Challenge"){
+         setGameState("Challenge");
+
+      }
+    },[]);
+﻿
+
+
+
+
+
+
+    const settings = useLocalStorage("settings",{
         artefacts: false,
-        temps: 0,
         randomMots: false,
         choixMots: "",
         wordsList: [],
+        nombreArticles: challenge === "Challenge" ? 1 : 0,
+        temps: challenge === "Challenge" ? 10 : 0,
+    });
 
-    }
 
     const [game, setGame] = useLocalStorage("game", {
-        players:[],
+        players: challenge === "Challenge" ?  [{id: 1, name: username, avatar: avatar, history: [], time: 0, score: 0, articles:new Map(),dictator:null,snail:null,inventory:[],currentArtefact:0 }]  : [],
         currentPlayer: 0,
-        settings: setting,
+        settings: settings,
         end: false,
         startTime:undefined,
         endTime:undefined,
         mined:new Map<number,string[][]>()
     });
 
-    if(gameState === "build"){
+
+
+    if(challenge == "Challenge" && gameState=="Challenge"){
+
+
+    return <><Loading  game={game} onChange={setGame} onChangeGameState={setGameState} gameState={gameState}/>
+    </>
+  }
+    else if(gameState === "build"){
         return(
             <SoloCreation game={game} onChange={setGame} onChangeGameState={setGameState}/>
         )
     }
     else if(gameState === "loading"){
         return(
-            <Loading  game={game} onChange={setGame} onChangeGameState={setGameState}/>
+            <Loading  game={game} onChange={setGame} onChangeGameState={setGameState} gameState={gameState}/>
         )
     }
     else if (gameState === "game") {
         // INITIALISE L'HISTORIQUE DANS LE PLAYER
+
         if (game.players[0].history.length === 0) {
             const randomTitle = game.settings.wordsList[Math.floor(Math.random() * game.settings.wordsList.length)];
             // Met à jour l'historique et la Map des articles du joueur
+
+
+
+        if (challenge = "Challenge"){
             const updatedPlayer = {
                 ...game.players[0],
-                history: [randomTitle],
-                articles: new Map(game.players[0].articles).set(randomTitle, true), // Marque l'article comme "true"
+                history: [game.settings.wordsList[0]],
+                articles: new Map(game.players[0].articles).set(game.settings.wordsList[0], true), // Marque l'article comme "true"
             };
-
             const updatedGame = {
                 ...game,
                 players: [updatedPlayer],
             };
             setGame(updatedGame);
+        }
+        else{
+            const updatedPlayer = {
+                ...game.players[0],
+                history: [randomTitle],
+                articles: new Map(game.players[0].articles).set(randomTitle, true), // Marque l'article comme "true"
+
+            };
+            const updatedGame = {
+                ...game,
+                players: [updatedPlayer],
+            };
+            setGame(updatedGame);
+        }
+
+
+
+
+
         }
 // INITIALISE LA MAP DANS LE PLAYER
         if (game.players.length > 0 && game.players[0].articles.size === 0) {
@@ -167,15 +219,7 @@ export const Game = () => {
             };
             setGame(updatedGame);
         }
-        //INITIALISE LE TIMER
-        if(game.startTime===undefined){
-            const startTime = Date.now();
-            const updatedGame = {
-                ...game,
-                startTime:startTime,
-            };
-            setGame(updatedGame);
-        }
+
         // AFFICHE LA PARTIE
       return <><SoloGame game={game} onChange={setGame} onChangeGameState={setGameState}/>
       </>
@@ -191,55 +235,7 @@ export const Game = () => {
             setGame(updatedGame);
         }
         return(
-            <EndGameSolo game={game}  onChangeGameState={setGameState}/>
+            <EndGameSolo game={game}  onChangeGameState={setGameState} challenge={challenge}/>
         )
     }
-}
-
-export const MultiGame = () => {
-
-
-  const [gameState, setGameState] = useLocalStorage("gameState", "build");
-  const setting = {
-      nombreArticles: 0,
-      artefacts: false,
-      temps: 0,
-      randomMots: false,
-      choixMots: "",
-      wordsList: [],
-  }
-
-  const [game, setGame] = useLocalStorage("game", {
-      players:[],
-      currentPlayer: 0,
-      settings: setting,
-      end: false,
-  });
-
-  if(gameState === "build"){
-      return(
-          <SoloCreation game={game} onChange={setGame} onChangeGameState={setGameState}/>
-      )
-  }
-  else if(gameState === "loading"){
-      return(
-          <Loading  game={game} onChange={setGame} onChangeGameState={setGameState}/>
-      )
-  }
-  else if(gameState === "game"){
-    if(game.players[0].articles.size === 0){
-      game.players[0] = {
-        ...game.players[0],
-        articles: new Map(game.settings.wordsList.map((article: string) => [article, false])),
-      }
-    }
-      return(
-          <SoloGame game={game} onChange={setGame} onChangeGameState={setGameState}/>
-      )
-  }
-  else {
-      return(
-          <EndGameSolo game={game}  onChangeGameState={setGameState}/>
-      )
-  }
 }

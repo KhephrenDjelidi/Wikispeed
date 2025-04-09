@@ -18,6 +18,8 @@ import { Link } from "react-router-dom";
 
 function Home() {
   localStorage.clear();
+  const navigate = useNavigate();
+  const [gameState, setGameState] = useState("Challenge"); // État pour le jeu
   const [inputValue, setInputValue] = useState<string>('');
   const [avatar, setAvatar] = useState<string>('/src/assets/avatar/Avatar_damien.svg'); 
   const [isNameChoosen, setIsNameChosen] = useState(false); // État pour savoir si le nom est choisi
@@ -46,6 +48,12 @@ function Home() {
       console.error('Erreur de navigation :', error);
     }
   };}
+
+  const goToChallengeQuotidien =() =>{
+
+    navigate("/game", { state: {gameState , username : inputValue , avatar : avatar} })
+  }
+
  
   
 
@@ -144,6 +152,7 @@ function Home() {
 
       </section>
 
+<button onClick={()=>goToChallengeQuotidien()}>tttt</button>
       <section className="second-part" id="rules">
         <BottomRedirection content="How To Play" link="#rules" />
         <Title title="How to play ?" />

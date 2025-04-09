@@ -41,7 +41,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     name: "Retour en arrière",
     description: "string",
     img: "string",
-    onActivate: backArtifact
+    onActivate: teleporter
   },
     {
     name: "Mine",
@@ -53,25 +53,31 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       name: "Escargot",
       description: "string",
       img: "string",
-      onActivate:startSnail
+      onActivate:teleporter
     },
     {
       name: "Dictateur",
       description: "string",
       img: "string",
-      onActivate: dictator
+      onActivate: teleporter
     },
     {
       name: "Gomme",
       description: "string",
       img: "string",
-      onActivate: eraser
+      onActivate: teleporter
     },
     {
       name: "Désorienteur",
       description: "string",
       img: "string",
-      onActivate: disorienter
+      onActivate: teleporter
+    },
+    {
+      name: "Téléporteur",
+      description: "string",
+      img: "string",
+      onActivate: teleporter
     }
   ];
 
@@ -379,6 +385,63 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       }
     }
 
+  }
+
+  async function teleporter() {
+    const player = props.game.players[props.game.currentPlayer];
+    const availableTitles = props.game.settings.wordsList.filter(
+      (title) => !player.articles.get(title)
+    );
+
+    if (availableTitles.length > 0) {
+      console.log("zzzzzzzzzzz");
+     
+      const randomTarget = availableTitles[Math.floor(Math.random() * availableTitles.length)];
+      const currentArticle = player.history[player.history.length - 1];
+
+      try {
+        const response = await fetch(`http://localhost:3001/solve?start_id=${encodeURIComponent(currentArticle)}&target_id=${encodeURIComponent(randomTarget)}`);
+        const data = await response.json();
+        console.log("dara",data)
+        const parsedPath = JSON.parse(data.path);
+        console.log("Parsed Path:", parsedPath);
+        if (data && data.path && data.path.length >= 2) {
+          const teleportArticle = data.path[1];
+
+          const newHistory = player.history ? [...player.history, teleportArticle] : [teleportArticle];
+          const newArticles = new Map(player.articles);
+          const value = newArticles.get(teleportArticle);
+
+          if (value !== undefined && !value) {
+            newArticles.set(teleportArticle, true);
+          }
+
+          const newInventory = soloPlayer.inventory.filter(item => item !== 6); // Assuming 6 is the ID for the teleporter artifact
+
+          const newPlayer: Player = {
+            ...player,
+            history: newHistory,
+            articles: newArticles,
+            inventory: newInventory,
+            currentArtefact: 0,
+          };
+
+          props.onChange({
+            ...props.game,
+            players: [newPlayer],
+          });
+
+          /*setPopupDisplay({
+            name: "Téléporteur",
+            image: "path/to/teleporter/image.svg", // Replace with the actual image path
+            message: `Vous avez été téléporté vers l'article : ${teleportArticle}`,
+            onclose: undefined,
+          });*/
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'utilisation du téléporteur :", error);
+      }
+    }
   }
 
   function dictatorUpdate(currentTitle: string) {

@@ -6,6 +6,7 @@ import hover from '../assets/music/hover.mp3';
 import click from '../assets/music/click.mp3';
 import { useEffect, useState } from "react";
 import { Game } from "../Game";
+import { getClosestArticle, getCurrentPosition } from "../functions/geolocalisation";
 
 export const CreateGame = (props: { children?: React.ReactNode }) => {
     const redirectTo = useRedirect()
@@ -44,11 +45,68 @@ export const PlayGame = (props: { link: string; onClick: (event: React.FormEvent
   );
 };
 
-
-export const Loading = (props: { game: Game; onChange: (newGame: Game) => void; onChangeGameState: (state: string) => void }) => {
+export const Loading = (props: { game: Game; gameState : String; onChange: (newGame: Game) => void; onChangeGameState: (state: string) => void }) => {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     
+    if (props.gameState == "Challenge") {
+
+        const fetchRandomArticles = async () => {
+          console.log("Vérification de l'article du jour...");
+        
+          try {
+            const response = await fetch('http://localhost:3000/get-article');
+            const data = await response.json();
+            
+            console.log("Article du jour : ", data.title);
+            return [data.title];
+          } catch (error) {
+            console.error("Erreur lors de la récupération de l'article du jour :", error);
+          }
+        };
+        
+    
+        const fetchArticle = async () => {
+          const article = [];
+          
+          try {
+            const position = await getCurrentPosition(); // Obtenir la position géographique
+            const { latitude, longitude } = position.coords;
+    
+            console.log("Position géographique :", { latitude, longitude });
+    
+            const articleTitle = await getClosestArticle(latitude.toString(), longitude.toString()); // Obtenir l'article à partir de la position
+            article.push(articleTitle);
+    
+            console.log("Article trouvé :", articleTitle);
+          } catch (error) {
+            console.error("Erreur de géolocalisation", error);
+          }
+    
+          return article;
+        };
+    
+        const fetchData = async () => {
+          const randomArticles = await fetchRandomArticles() || []; // Assurez-vous que ce soit un tableau vide s'il est undefined
+          const locationArticle = await fetchArticle() || []; // Assurez-vous que ce soit un tableau vide s'il est undefined
+    
+          const allArticles = [...locationArticle,...randomArticles]; // Fusionner les deux tableaux
+          const newGame = { ...props.game };
+          newGame.settings.wordsList = allArticles;
+          console.log("Articles combinés :", allArticles);
+          props.onChange(newGame);
+    
+          timer = setTimeout(() => props.onChangeGameState("game"), 1000);
+        };
+    
+        fetchData(); // Appeler les deux fonctions au chargement du composant
+    
+        return () => {
+          if (timer) clearTimeout(timer);
+        };
+    }
+    else{
+
     const fetchRandomArticles = async () => {
       if (!props.game.settings.randomMots || props.game.settings.nombreArticles <= 0) {
         timer = setTimeout(() => props.onChangeGameState("game"), 2000);
@@ -79,6 +137,7 @@ export const Loading = (props: { game: Game; onChange: (newGame: Game) => void; 
     return () => {
       if (timer) clearTimeout(timer);
     };
+    }
   }, [props.game.settings.randomMots, props.game.settings.nombreArticles, props.onChange, props.onChangeGameState]);
 
   return <div className="loading-container">LOADING</div>;

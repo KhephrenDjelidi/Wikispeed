@@ -5,7 +5,7 @@ import './style/timer.css';
 import './style/game.css';
 import {ArticleDisplayer} from './component/Article';
 import {Background} from "./assets/back.tsx";
-import {useState} from 'react';
+import {useState ,useEffect} from 'react';
 import type {Player} from './types/Player.ts';
 import {Game} from './Game.tsx';
 import {createPortal} from 'react-dom';
@@ -24,6 +24,14 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
   function addToInventory(Artifact: number) {
     if(soloPlayer.inventory.length==2 || soloPlayer.inventory.includes(Artifact)){
+      const newPlayer: Player = {
+        ...soloPlayer,
+        currentArtefact:0,
+      };
+      props.onChange({
+        ...props.game,
+        players: [newPlayer],
+      });
       return;
     }
     const newPlayer: Player = {
@@ -35,65 +43,116 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       ...props.game,
       players: [newPlayer],
     });
-
   }
   const artefactList: Artifact[] = [    {
     name: "Retour en arrière",
-    description: "string",
-    img: "string",
-    onActivate: teleporter
+    description: "Vous fait revenir sur la page précédente.",
+    img: back,
+    onActivate: backArtifact
   },
     {
     name: "Mine",
-    description: "string",
-    img: "string",
+    description: "Pose la mine ou tu le souhaites et piège tes adversaires",
+    img: mine,
     onActivate: placemine
   },
     {
       name: "Escargot",
-      description: "string",
-      img: "string",
-      onActivate:teleporter
+      description: "La malédiction de l'escargot a frappé ! Vous ne pouvez plus changer de page pendant 1 minute.",
+      img: snail,
+      onActivate:startSnail
     },
     {
       name: "Dictateur",
-      description: "string",
-      img: "string",
-      onActivate: teleporter
+      description: "Le dictateur vous donne un ordre, vous rendre sur un des articles cible et ignorer les autres.",
+      img: dictateur,
+      onActivate: dictator
     },
     {
       name: "Gomme",
-      description: "string",
-      img: "string",
-      onActivate: teleporter
+      description: "Supprime le dernier article trouvé de la liste !",
+      img: gomme,
+      onActivate: eraser
     },
     {
       name: "Désorienteur",
-      description: "string",
-      img: "string",
-      onActivate: teleporter
-    },
-    {
-      name: "Téléporteur",
-      description: "string",
-      img: "string",
-      onActivate: teleporter
+      description: "Vous téléporte aléatoirement sur wikipedia, laissez parler votre chance",
+      img: desorienter,
+      onActivate: disorienter
     }
   ];
+  const popupList:popup[]=[
+    {
+      name: "Retour a été ajouté a votre inventaire",
+      image: back,
+      message: "Un bouton de retour a été ajouté a votre inventaire, utilisez le pour retourner sur l'article précédent",
+      onclose: undefined,
+    },
+    {
+      name: "Mine a été ajouté a votre inventaire",
+      image: mine,
+      message: "Une mine a été ajouté a votre inventaire, posez la pour miner le terrain de vos adversaires",
+      onclose: undefined,
+    },
+    {
+      name: "Escargot a été activé !",
+      image: snail,
+      message: "La malédiction de l'escargot vient de frapper ! Vous êtes aussi lent que lui et vous ne pouvez plus changer d'article pendant 1 minutes, prenez le temps de réfléchir.",
+      onclose: undefined,
+    },
+    {
+      name: "Dictateur a été activé !",
+      image: dictateur,
+      message: "Le Dictateur a parlé, vous devez vous rendre sur l'article : " + props.game.players[props.game.currentPlayer].dictator + ", votre liste d'articles ne sera plus mise à jour tant que le dictateur ne sera pas satisfait !",
+      onclose: undefined,
+    },
+    {
+      name: "Gomme a été activé !",
+      image: gomme,
+      message: "Pas de chance, la Gomme viens d'être activté, vous avez perdu votre dernier article trouvé !",
+      onclose: undefined
+    },
+    {
+      name: "Désorienteur a été activé !",
+      image: desorienter,
+      message: "Le Désorienteur vient de s'activer, vous allez être amené vers un article aléatoire, bonne chance !",
+      onclose: undefined,
+    }
+  ]
+  //DETECTION DES ARTÉFACTS EN COURS
+  const currentArtefactIndex=soloPlayer.currentArtefact;
 
-  const currentArtefactIndex = soloPlayer.currentArtefact;
-  console.log(soloPlayer.currentArtefact);
-  if (currentArtefactIndex !== 0 && artefactList[currentArtefactIndex-1] !== undefined) {
-    const artefact = artefactList[currentArtefactIndex-1];
-    console.log("ARTEFACT",artefact);
-    if (currentArtefactIndex === 1 || currentArtefactIndex === 2) {
-      addToInventory(currentArtefactIndex);
+  useEffect(() => {
+    if (currentArtefactIndex !== 0 && artefactList[currentArtefactIndex - 1] !== undefined) {
+      const artefact = artefactList[currentArtefactIndex - 1];
+      console.log("ARTEFACT", artefact);
+
+      if (popupDisplay === null) {
+        if (currentArtefactIndex === 1 || currentArtefactIndex === 2 ) {
+          if(!soloPlayer.inventory.includes(currentArtefactIndex)){
+            setPopupDisplay(popupList[currentArtefactIndex - 1]);
+            addToInventory(currentArtefactIndex);
+          }
+          else{
+            const newPlayer: Player = {
+              ...soloPlayer,
+              currentArtefact:0,
+            };
+            props.onChange({
+              ...props.game,
+              players: [newPlayer],
+            });
+          }
+
+        } else if (artefact.onActivate !== undefined) {
+          setPopupDisplay(popupList[currentArtefactIndex - 1]);
+          artefact.onActivate();
+        }
+      }
     }
-    else if (artefact.onActivate !== undefined) {
-      console.log(artefact.onActivate);
-      artefact.onActivate();
-    }
-  }
+  }, [currentArtefactIndex, popupDisplay,addToInventory,artefactList,popupList,soloPlayer.inventory,props,soloPlayer]);
+
+
   const updateHistoryAndMap = async (articleTitle: string) => {
     const newHistory = soloPlayer.history ? [...soloPlayer.history, articleTitle] : [articleTitle];
     const newArticles = new Map(soloPlayer.articles);
@@ -130,12 +189,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       players: [newPlayer],
     });
 
-    /*setPopupDisplay({
-      name: "Escargot",
-      image: snail,
-      message: "La malédiction de l'escargot vient de frapper ! Vous êtes aussi lent que lui et vous ne pouvez plus changer d'article pendant 1 minutes, prenez le temps de réfléchir.",
-      onclose: undefined,
-    });*/
   }
   const resetSnail=()=>{
     const newPlayer: Player = {
@@ -178,7 +231,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     const min = 3;
     console.log(",,,,,,",artefactList.length)
     console.log(",,,,,,",artefactList)
-    const max = artefactList.length-1;
+    const max = artefactList.length;
     console.log(min,max)
     const range = max - min + 1;
     console.log("range",range)
@@ -204,7 +257,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       return 0;
     }
     else {
-
       const medianePopularity = popularity.firstArticlePopularity / 800;
       console.log("firstArticlePopularity",popularity.firstArticlePopularity)
       console.log("medianePopularity",medianePopularity)
@@ -238,7 +290,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       } else {
         return 0;
       }
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -253,13 +305,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
 
   function backArtifact() {
-/*
-    setPopupDisplay({
-      name: "Retour",
-      image: back,
-      message: "Vous venez d'activer le retour en arrière, vous venez de remonter dans le temps",
-      onclose: undefined,
-    });*/
     const newInventory = soloPlayer.inventory.filter(item => item !== 1);
 
     const articleTitle=props.game.players[props.game.currentPlayer].history.slice(-2)[0]
@@ -267,7 +312,12 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     const newArticles = new Map(soloPlayer.articles);
     const value = newArticles.get(articleTitle);
     props.game.players[props.game.currentPlayer].dictator = null;
-
+    setPopupDisplay({
+          name: "Retour a été activé !",
+          image: back,
+          message: "Vous venez d'activer le retour en arrière, vous venez de remonter dans le temps",
+          onclose: undefined,
+        })
     if (value !== undefined && !value) {
       newArticles.set(articleTitle, true);
     }
@@ -285,13 +335,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   }
 
   function eraser() {
-    /*setPopupDisplay({
-      name: "Gomme",
-      image: gomme,
-      message: "Pas de chance, la Gomme viens d'être activté, vous avez perdu votre dernier article trouvé !",
-      onclose: undefined
-    });*/
-
     if (1 == 1) {
       for (let i = props.game.players[props.game.currentPlayer].history.length - 1; i >= 0; i--) {
         const articleTitle = props.game.players[props.game.currentPlayer].history[i];
@@ -317,14 +360,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   }
 
   async function disorienter() {
-    /*
-    setPopupDisplay({
-      name: "Désorienter",
-      image: desorienter,
-      message: "Le Désorienter vient de s'activer, vous allez être amené vers un article aléatoire, bonne chance !",
-      onclose: undefined,
-    });*/
-
     if (1 == 1) {
       const response = await fetch("https://fr.wikipedia.org/api/rest_v1/page/random/summary");
       const data = await response.json();
@@ -354,13 +389,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   function dictator() {
     const articlesMap = new Map(props.game.players[props.game.currentPlayer].articles);
 
-    /*
-       setPopupDisplay({
-      name: "Dictateur",
-      image: dictateur,
-      message: "Le Dictateur a parlé, vous devez vous rendre sur l'article : " + props.game.players[props.game.currentPlayer].dictator + ", votre liste d'articles ne sera plus mise à jour tant que le dictateur ne sera pas satisfait !",
-      onclose: undefined,
-    });*/
     if (1 == 1) {
       if (!props.game.players[props.game.currentPlayer].dictator) {
         const availableTitles = props.game.settings.wordsList.filter(
@@ -492,6 +520,12 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     }
   };
   async function placemine() {
+    setPopupDisplay({
+      name: "Vous avez posez une mine.",
+      image: mine,
+      message: "Cet article et tout les articles vers lequel il renvoie seront piégé pour vos adversaires",
+      onclose: undefined,
+    })
     const player = props.game.players[props.game.currentPlayer];
 
     const previousMined = props.game.mined;
@@ -520,6 +554,16 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
     }
   }
   function mined(newMined : Map<number,string[][]>) {
+    setPopupDisplay({
+      name: "Mine a été activé !",
+      image: mine,
+      message: "Igo, le terrain est miné, pour de vrai, pour de vrai, le terrain est miné\n" +
+          "Faut tailler, nous, on est loin d'l'époque où fallait détailler\n" +
+          "Maintenant, il m'faut des factures détaillées, hum\n" +
+          "Ça sentait toujours la caille, les taudis, les RS, les RS, les Cayenne\n" +
+          "Les petits, ils oublient d'respecter les doyens, les doyens, ils oublient d'respecter les petits",
+      onclose: undefined,
+    })
     let target = null;
     for (let i = 5; i >= 1; i--) {
       const index = soloPlayer.history.length - i;
@@ -541,16 +585,6 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
       });
     }
 
-    /*setPopupDisplay({
-      name: "Mine",
-      image: mine,
-      message: "Igo, le terrain est miné, pour de vrai, pour de vrai, le terrain est miné\n" +
-          "Faut tailler, nous, on est loin d'l'époque où fallait détailler\n" +
-          "Maintenant, il m'faut des factures détaillées, hum\n" +
-          "Ça sentait toujours la caille, les taudis, les RS, les RS, les Cayenne\n" +
-          "Les petits, ils oublient d'respecter les doyens, les doyens, ils oublient d'respecter les petits",
-      onclose: undefined,
-    });*/
   }
   return (
       <>
@@ -634,6 +668,21 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
 
           RESET
         </button>
+        <button onClick={() => { const newPlayer = {
+          ...props.game.players[props.game.currentPlayer],
+          dictator:null,
+          currentArtefact:1,
+          snail:null
+        };
+          props.onChange({
+            ...props.game,
+            players: [newPlayer],
+          });
+        }}>
+
+          TEST
+        </button>
+        <p>{soloPlayer.currentArtefact}</p>
 
       </>
   );

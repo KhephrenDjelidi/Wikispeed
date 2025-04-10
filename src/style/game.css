@@ -654,7 +654,6 @@ align-items : stretch;
 }
 
 .button{
-  margin-top: 10px;
   width: 15vw;
   height: 4vw;
   border-radius: 10px;
@@ -667,12 +666,7 @@ align-items : stretch;
   justify-content: center;
   align-items: center;
   gap: 4%;
-  color: #FFB700;
-  font-family: 'Manjari', sans-serif;
-  font-weight: 700;
 }
-
-
 
 .container .title{
   margin-top: 0;
@@ -683,7 +677,6 @@ align-items : stretch;
   text-transform: none;
   text-shadow: none;
   padding-top: 0;
-  
  
 }
 .container .opt{

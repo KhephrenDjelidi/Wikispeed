@@ -52,18 +52,26 @@ function SoloCreation(props:{game : Game; onChange:(newGame:Game)=> void; onChan
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && choixMots.trim() !== "") {
+      event.preventDefault();
+  
+      const mot = choixMots.trim().toLowerCase(); // Pour éviter les doublons avec des majuscules/minuscules
+      const isDuplicate = wordsList.some((w) => w.toLowerCase() === mot);
+  
+      if (isDuplicate) {
+        alert("Ce mot a déjà été ajouté.");
+        return;
+      }
+  
       if (wordsList.length >= Number(nombreArticles)) {
         alert("Vous ne pouvez pas ajouter plus de mots.");
-        event.preventDefault()
-      } 
-      else {
-      event.preventDefault(); 
+        return;
+      }
   
       setWordsList((prevWords) => [...prevWords, choixMots]);
       setChoixMots("");
     }
-  }
   };
+
 
   const handleRemoveWord = (wordToRemove: string) => {
     setWordsList((prevWords) => prevWords.filter((word) => word !== wordToRemove));

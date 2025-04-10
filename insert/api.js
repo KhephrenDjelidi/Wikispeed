@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://Server:PAitDBovuYfZKInh@qdcloud.8xeyc.mongodb.net/?retryWrites=true&w=majority&appName=QDcloud', {
+mongoose.connect('mongodb+srv://User:User@qdcloud.8xeyc.mongodb.net/?retryWrites=true&w=majority&appName=QDcloud', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

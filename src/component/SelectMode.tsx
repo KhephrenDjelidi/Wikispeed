@@ -25,12 +25,12 @@ export const SelectMode = (props: { title: string, img: string, link: string, on
     };
 
     return (
-        <div className='select-mode' >
+        <div className='select-mode' onClick={handleClick} >
             <img 
                 className="select-img" 
                 src={props.img} 
                 alt={props.title} 
-                onClick={handleClick} 
+
             />
             <div className='mode'>
                 <h2 className="manjari">{props.title}</h2>

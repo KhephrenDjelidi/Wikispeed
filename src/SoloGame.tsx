@@ -297,6 +297,7 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
   const fetchArticlePopularity = async (title: string) => {
     try {
       const query = `http://localhost:3001/articles?title=${title}`;
+      console.log("query",query)
       const response = await fetch(query);
       const data = await response.json();
 
@@ -456,18 +457,18 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
         const data = await response.json();
         console.log("dara",data)
 
-        const pathAsList = (data.path);
+        const pathAsList = (data.Path);
         console.log("Parsed Path:", pathAsList);
-        if (data && data.path && data.path.length >= 2) {
-          const lenghth = data.path.length;
-          if(lenghth < 4) {
+        if (data && data.Path && data.Path.length >= 2) {
+          const length = data.Path.length;
+          console.log("length",length)
+          if(length < 4) {
             setPopupDisplay({
               name: "Téléporteur",
               image: teleporteur, 
               message: `Vous n'avez été téléporté vers l'article car vous en êtes trop proche`,
               onclose: undefined,
             });
-
             return;
           }
           setPopupDisplay({
@@ -476,7 +477,8 @@ function SoloGame(props: { game: Game; onChange: (newGame: Game) => void; onChan
             message: "Vous venez d'activer le téléporteur, vous allez être téléporté à 2 liens de l'article : ",
             onclose: undefined,
           })
-          const teleportArticle = data.path[lenghth - 3];
+          const teleportArticle = data.Path[length - 3];
+          console.log(teleportArticle)
 
           const newHistory = player.history ? [...player.history, teleportArticle] : [teleportArticle];
           const newArticles = new Map(player.articles);

@@ -108,25 +108,17 @@ export function useLocalStorage(key: string, initialValue: any) {
 
 export const Game = () => {
     const location = useLocation();
-    let challenge = location.state?.gameState || "";
+    const challenge = location.state?.gameState || "";
     const username = location.state?.username || ""; 
     const avatar = location.state?.avatar  || "";
-
 
     const [gameState, setGameState] = useLocalStorage("gameState", "build");
 
     useEffect(()=>{
      if (challenge == "Challenge"){
          setGameState("Challenge");
-
       }
-    },[]);
-﻿
-
-
-
-
-
+    },[challenge,setGameState]);
 
     const settings = useLocalStorage("settings",{
         artefacts: false,
@@ -175,7 +167,7 @@ export const Game = () => {
 
 
 
-        if (challenge = "Challenge"){
+        if (challenge == "Challenge"){
             const updatedPlayer = {
                 ...game.players[0],
                 history: [game.settings.wordsList[0]],
@@ -200,10 +192,6 @@ export const Game = () => {
             };
             setGame(updatedGame);
         }
-
-
-
-
 
         }
 // INITIALISE LA MAP DANS LE PLAYER

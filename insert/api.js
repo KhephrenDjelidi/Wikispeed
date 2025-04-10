@@ -4,9 +4,6 @@ import cors from 'cors';  // Ajoute l'import du package cors
 import Article from './Articles.js';
 import { exec } from "child_process";
 
-
-
-
 const app = express();
 
 // Activer CORS pour toutes les origines
@@ -61,7 +58,6 @@ app.get("/articles", async (req, res) => {
   }
 });
 
-
 // Assure-toi que la sortie soit bien encodée en JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -91,26 +87,31 @@ app.get("/solve", (req, res) => {
       }
 
       try {
-        // Parse directement le JSON renvoyé par le script Python
-        const data = JSON.parse(stdout);
+        // Exemple de stdout : "Distance: 3\nPath: ['Paris', 'Station F', 'OpenAI', 'ChatGPT']"
+        const lines = stdout.trim().split('\n');
+        const data = {};
 
-        // Assurer que le contenu soit bien UTF-8
+        lines.forEach(line => {
+          const [key, value] = line.split(/:\s(.+)/); // Split en gardant ce qu’il y a après ": " comme valeur
+          if (key === 'Distance') {
+            data.Distance = parseInt(value);
+          } else if (key === 'Path') {
+            data.Path = JSON.parse(value.replace(/'/g, '"')); // Remplace les quotes simples par doubles pour JSON.parse
+          }
+        });
+
         res.setHeader("Content-Type", "application/json; charset=utf-8");
-
-        // Renvoie la réponse en JSON
         res.json(data);
       } catch (parseError) {
         console.error("Erreur de parsing du JSON du Python:", parseError);
-        return res.status(500).send("Invalid JSON format from Python script.");
+        return res.status(500).send("Invalid format from Python script.");
       }
     }
   );
 });
-
 
 // Lancer le serveur
 const port = 3001;
 app.listen(port, () => {
   console.log(`🚀 API Popularité en ligne sur http://localhost:${port}`);
 });
-

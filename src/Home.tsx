@@ -1,4 +1,4 @@
-import { useState } from 'react'; // Importer useState pour gérer l'état du nom d'utilisateur
+import {useEffect, useState} from 'react'; // Importer useState pour gérer l'état du nom d'utilisateur
 import { useNavigate } from 'react-router-dom'; // Importer useNavigate pour gérer la navigation
 import { LogoTitle, CreditButton, RuleBlox, ArtifactsList, Footer, Title, BottomRedirection } from './component/Component';
 import { SelectMode, NextHome } from './component/SelectMode';
@@ -29,12 +29,12 @@ function Home() {
   const handleAvatarChange = (newAvatar: string) => {
     setAvatar(newAvatar); // Mets à jour l'avatar
   };
- 
+
   console.log('Avatar sélectioé :', avatar);
 
   // Validation de l'input
   const isInputValid = inputValue.trim() !== '';
-  
+
   // Fonction de navigation
   const navigateToPage = (link: string  ) => {
     if (!isInputValid) {
@@ -96,7 +96,7 @@ function Home() {
             <SelectMode 
                 title="Solo" 
                 img={images.green} 
-                link="solocreation" 
+                link=""
                 isInputValid={isInputValid} // Contrôle la validation
                 onClick={() => navigateToPage('./game')} 
               />
@@ -128,13 +128,13 @@ function Home() {
           </div>
 
           {isNameChoosen && 
-              <div className="phone-selection">                 
-                <SelectMode 
-                title="Solo" 
-                img={images.green} 
-                link="solocreation" 
+              <div className="phone-selection">
+                <SelectMode
+                title="Solo"
+                img={images.green}
+                link="solocreation"
                 isInputValid={isInputValid} // Contrôle la validation
-                onClick={() => navigateToPage('./game')} 
+                onClick={() => navigateToPage('./game')}
                 />
               <div className="or"> <span className='manjari'>OU</span></div>
                 <SelectMode 

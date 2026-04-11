@@ -1,35 +1,33 @@
 # React + TypeScript + Vite
 
-## Docker (single container)
+## Docker Compose (multi-container)
 
-This repository now supports running frontend + API + solver API + websocket server in one Docker container.
+The project runs with one service per domain plus a reverse proxy:
 
-Build image:
+- `frontend` (Vite preview on port `4173`)
+- `frontend-api` (`frontend/src/utils/serveur.js` on port `3000`)
+- `insert` (`insert/api.js` + `solver.py` on port `3001`)
+- `chatserver` (WebSocket server on port `2025`)
+- `reverse-proxy` (Nginx on port `8080`)
+
+Start everything from the repository root:
 
 ```bash
-docker build -t wikispeed-all-in-one .
+docker compose up --build
 ```
 
-Run container:
-
-```bash
-docker run --rm -p 8080:8080 \
-  -e MONGODB_URI="your-mongo-uri" \
-  -e MONGODB_URI_SOLVER="your-solver-mongo-uri" \
-  wikispeed-all-in-one
-```
-
-App entrypoint will be available on:
+App entrypoint:
 
 ```text
 http://localhost:8080
 ```
 
-The frontend uses internal proxied paths:
+Reverse proxy routes:
 
-- `/api/*` -> score/ranking API
-- `/solver/*` -> solver/popularity API
-- `/ws` -> websocket chat/game server
+- `/` -> frontend
+- `/api/*` -> frontend-api
+- `/solver/*` -> insert API
+- `/ws` -> chatserver (WebSocket)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -46,14 +44,14 @@ If you are developing a production application, we recommend updating the config
 
 ```js
 export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+	languageOptions: {
+		// other options...
+		parserOptions: {
+			project: ["./tsconfig.node.json", "./tsconfig.app.json"],
+			tsconfigRootDir: import.meta.dirname,
+		},
+	},
+});
 ```
 
 - Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
@@ -62,20 +60,20 @@ export default tseslint.config({
 
 ```js
 // eslint.config.js
-import react from 'eslint-plugin-react'
+import react from "eslint-plugin-react";
 
 export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+	// Set the react version
+	settings: { react: { version: "18.3" } },
+	plugins: {
+		// Add the react plugin
+		react,
+	},
+	rules: {
+		// other rules...
+		// Enable its recommended rules
+		...react.configs.recommended.rules,
+		...react.configs["jsx-runtime"].rules,
+	},
+});
 ```
